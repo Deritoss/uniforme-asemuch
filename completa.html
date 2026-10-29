@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi uniforme 2026</title>
+<meta name="theme-color" content="#F2C230">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi uniforme">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>.homebtn{width:40px;height:40px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;color:inherit;flex:none;text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)}.homebtn:active{transform:scale(.94)}.hwrap{display:flex;align-items:center;gap:8px;min-width:0}</style>
+</head>
+<body>
+<style>
+/* Estilo "taller de costura", fácil de seguir. Una sola apariencia clara, a propósito (papel, huincha, carretes).
+   Gesto propio: la huincha de medir marca el paso; las etiquetas de ropa dan el veredicto.
+   Movimiento: solo transform y opacity; curvas fuertes; lo que entra usa ease-out, lo que se desplaza en pantalla ease-in-out. */
+:root {
+  color-scheme: light;
+  --ground: #E9EDF2;   /* lino frío */
+  --paper: #FFFFFF;
+  --ink: #1C2D4A;      /* azul marino tela */
+  --muted: #3F4D63;
+  --line: #B9C3D0;
+  --tape: #F2C230;     /* huincha */
+  --tapeDone: #E0AE1C;
+  --kraft: #D9BE92;    /* etiqueta */
+  --thread: #C2412D;   /* hilo rojo: la única señal de acento */
+  --wood: #8A6A43;
+  --okFg: #1E6B3F; --okBg: #DDF0E4;
+  --warnFg: #7A4200; --warnBg: #F7E2B5;
+  --badFg: #A3241C; --badBg: #F8D9D5;
+  --cond: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --pendulum: cubic-bezier(0.45, 0, 0.55, 1);
+  --lift: 0 1px 0 rgba(28, 45, 74, .05), 0 2px 6px -2px rgba(28, 45, 74, .16);
+}
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink);
+  font-family: var(--body); font-size: 17px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--tape); }
+.wrap { max-width: 560px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--cond); font-weight: 800; margin: 0; line-height: 1.02; text-wrap: balance; }
+h1 { font-size: clamp(2.1rem, 9vw, 2.6rem); letter-spacing: -0.005em; }
+h2 { font-size: 1.65rem; }
+h3 { font-size: 1.35rem; }
+p { margin: 0; text-wrap: pretty; }
+.muted { color: var(--muted); }
+button {
+  font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform 140ms var(--ease-out), background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, color 200ms ease;
+}
+button:active { transform: scale(.97); }
+.cat:active, .dunno:active, .btn:active, .nt:active { transform: scale(.985); }
+:focus-visible { outline: 3px solid var(--thread); outline-offset: 3px; }
+svg { display: block; }
+.ico { width: 22px; height: 22px; flex: none; }
+
+/* Huincha de medir: marca el paso y sirve para saltar entre pasos */
+.tape { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))); background: var(--ground); }
+.tape-in { max-width: 592px; margin: 0 auto; position: relative; height: 58px; overflow: hidden; }
+.tape-bar { position: absolute; inset: 0 0 auto; height: 36px; background: var(--tape); overflow: hidden; box-shadow: 0 1px 0 rgba(28, 45, 74, .12); }
+.tape-bar::before { content: ""; position: absolute; inset: 0 0 auto; height: 7px; background: repeating-linear-gradient(90deg, var(--ink) 0 1.2px, transparent 1.2px 12px); opacity: .85; z-index: 1; }
+.tape-done { position: absolute; left: 0; top: 0; width: 100%; height: 36px; background: var(--tapeDone); transform-origin: left center; transition: transform 460ms var(--ease-in-out); }
+.tape-nums { position: absolute; inset: 0 0 auto; height: 36px; display: grid; grid-template-columns: repeat(7, 1fr); z-index: 2; }
+.tape-nums button { border: 0; background: transparent; position: relative; font-weight: 700; font-size: 13px; padding-top: 12px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tape-nums button:active { transform: none; background: rgba(28, 45, 74, .1); }
+.tape-nums button::before { content: ""; position: absolute; top: 0; left: 50%; width: 1.6px; height: 13px; background: var(--ink); }
+.pin-track { position: absolute; inset: 0; pointer-events: none; z-index: 3; transition: transform 460ms var(--ease-in-out); }
+.pin { position: absolute; left: 0; top: 3px; width: 28px; margin-left: -14px; display: flex; flex-direction: column; align-items: center; }
+.pin b { width: 26px; height: 26px; border-radius: 50%; background: var(--thread); color: #fff; display: grid; place-items: center; font-size: 14px; font-weight: 800; box-shadow: 0 2px 0 rgba(0,0,0,.15); font-variant-numeric: tabular-nums; }
+.pin i { width: 2px; height: 12px; background: var(--thread); }
+.pin i::after { content: ""; display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--thread); margin: 10px 0 0 -2px; }
+
+/* Cabecera */
+.top { display: flex; flex-direction: column; gap: 10px; padding-top: 8px; }
+.toprow { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.stepname { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.sound { display: inline-flex; align-items: center; gap: 6px; height: 44px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--paper); padding: 0 14px 0 10px; font-size: 15px; font-weight: 600; flex: none; box-shadow: var(--lift); }
+.sound[aria-pressed="false"] { color: var(--muted); box-shadow: none; background: transparent; }
+.catrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.kraft { position: relative; display: inline-flex; align-items: center; background: var(--kraft); padding: 5px 14px 5px 24px; font-weight: 700; font-size: 14px; border-radius: 0 8px 8px 0; clip-path: polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%); }
+.kraft::before { content: ""; position: absolute; left: 10px; top: 50%; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--ground); }
+.textbtn { border: 0; background: none; padding: 0 2px; min-height: 44px; font-weight: 700; font-size: 15px; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; display: inline-flex; align-items: center; gap: 6px; }
+
+main { padding: 18px 0 24px; }
+main:focus { outline: none; }
+.panel { display: flex; flex-direction: column; gap: 20px; }
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+.panel.enter > * { animation: enter 340ms var(--ease-out) both; }
+.panel.enter > *:nth-child(2) { animation-delay: 40ms; } .panel.enter > *:nth-child(3) { animation-delay: 80ms; }
+.panel.enter > *:nth-child(4) { animation-delay: 120ms; } .panel.enter > *:nth-child(5) { animation-delay: 160ms; }
+.panel.enter > *:nth-child(n+6) { animation-delay: 200ms; }
+.intro { display: flex; flex-direction: column; gap: 6px; }
+.sec { display: flex; align-items: center; gap: 10px; }
+.num { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-family: var(--cond); font-weight: 800; font-size: 20px; flex: none; }
+.card { background: var(--paper); border-radius: 16px; padding: 16px; box-shadow: var(--lift); }
+.more { border: 0; background: none; padding: 0; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 16px; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; align-self: flex-start; }
+.more:active { transform: scale(.98); }
+
+/* Categorías */
+.cat { width: 100%; text-align: left; border: 2px solid var(--ink); border-radius: 18px; background: var(--paper); padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 3px 0 var(--ink); }
+.cat:active { box-shadow: 0 1px 0 var(--ink); }
+.cat .hd { display: flex; align-items: center; gap: 14px; }
+.cat .art { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; flex: none; }
+.cat .art .ico { width: 32px; height: 32px; }
+.cat.a .art { background: #DCE4F2; color: #1D4189; } .cat.b .art { background: #F4E6C4; color: #8A5A00; }
+.cat .where { font-family: var(--cond); font-weight: 800; font-size: 1.55rem; line-height: 1.05; }
+.cat .ex { color: var(--muted); font-size: 16px; }
+.cat .ft { display: flex; justify-content: space-between; align-items: center; border-top: 1.5px dashed #CBD3DE; padding-top: 10px; font-size: 15px; }
+.cat .go { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: var(--thread); }
+.cat .go .ico { transition: transform 200ms var(--ease-out); }
+.dunno { height: 56px; border-radius: 14px; border: 2px dashed #8A99AD; background: transparent; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
+
+/* Prendas */
+.g { display: block; }
+.dye { transition: fill 320ms ease; }
+.det { transition: stroke 320ms ease; }
+.must { display: flex; flex-direction: column; gap: 10px; }
+.mrow { display: flex; align-items: center; gap: 14px; background: var(--paper); border-radius: 16px; padding: 12px 14px; box-shadow: var(--lift); }
+.mrow .g { width: 72px; height: 72px; flex: none; }
+.mrow .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.mrow .nm { font-family: var(--cond); font-weight: 800; font-size: 1.35rem; line-height: 1.05; }
+.qty { font-family: var(--cond); font-weight: 800; font-size: 1rem; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 10px; align-self: flex-start; }
+.dots { display: flex; gap: 4px; align-items: center; }
+.dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #C7D0DB; }
+.saldo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.st { background: var(--paper); border-radius: 14px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; font-size: 14px; line-height: 1.15; box-shadow: var(--lift); }
+.st .g { width: 44px; height: 44px; }
+.strip { display: flex; align-items: center; gap: 12px; border-radius: 14px; padding: 12px 14px; background: var(--paper); box-shadow: var(--lift); }
+.strip .bx { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; flex: none; background: #DCE4F2; color: #1D4189; }
+.strip > div { flex: 1; min-width: 0; font-size: 16px; display: flex; flex-direction: column; gap: 2px; }
+.strip.warn, .strip.ok, .strip.bad { box-shadow: none; }
+.strip.warn { background: var(--warnBg); } .strip.warn .bx { background: var(--warnFg); color: #fff; }
+.strip.ok { background: var(--okBg); } .strip.ok .bx { background: var(--okFg); color: #fff; }
+.strip.bad { background: var(--badBg); } .strip.bad .bx { background: var(--badFg); color: #fff; }
+
+/* Parka */
+.four { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ladder { display: flex; flex-direction: column; gap: 8px; }
+.rung { display: flex; align-items: center; gap: 12px; border-radius: 14px; padding: 10px 14px; }
+.rung .pos { font-family: var(--cond); font-weight: 800; font-size: 1.6rem; width: 34px; text-align: center; flex: none; }
+.rung.ok { background: var(--okBg); } .rung.ok .pos { color: var(--okFg); }
+.rung.warn { background: var(--warnBg); } .rung.warn .pos { color: var(--warnFg); }
+.rung.bad { background: var(--badBg); } .rung.bad .pos { color: var(--badFg); }
+.rung .spools { display: flex; gap: 2px; flex: none; }
+.yesno { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.big { min-height: 58px; border-radius: 14px; border: 2px solid var(--line); background: var(--paper); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--lift); }
+.big[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* Etiqueta colgante (veredicto): cae la primera vez; si cambia, se balancea como péndulo */
+.hang { display: flex; flex-direction: column; align-items: center; transform: rotate(7deg); transform-origin: top center; }
+@keyframes drop {
+  0% { opacity: 0; transform: translateY(-18px) rotate(-14deg); animation-timing-function: var(--ease-out); }
+  45% { opacity: 1; transform: translateY(0) rotate(11deg); animation-timing-function: var(--pendulum); }
+  75% { transform: rotate(5deg); animation-timing-function: var(--pendulum); }
+  100% { transform: rotate(7deg); }
+}
+@keyframes sway {
+  0% { transform: rotate(-5deg); animation-timing-function: var(--pendulum); }
+  45% { transform: rotate(11deg); animation-timing-function: var(--pendulum); }
+  75% { transform: rotate(5.5deg); animation-timing-function: var(--pendulum); }
+  100% { transform: rotate(7deg); }
+}
+.hang.drop { animation: drop 560ms both; }
+.hang.sway { animation: sway 460ms both; }
+.hang .str { width: 2px; height: 26px; background: var(--ink); }
+.tag { position: relative; padding: 18px 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; border: 2px solid currentColor; clip-path: polygon(50% 0, 100% 16px, 100% 100%, 0 100%, 0 16px); font-family: var(--cond); font-weight: 800; font-size: 21px; line-height: 1; }
+.tag::before { content: ""; position: absolute; top: 8px; left: 50%; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1.5px currentColor; }
+.tag.ok { background: var(--okBg); color: var(--okFg); } .tag.warn { background: var(--warnBg); color: var(--warnFg); } .tag.bad { background: var(--badBg); color: var(--badFg); }
+/* Resultado: con una costura punteada, como una etiqueta cosida */
+.res { display: flex; flex-direction: column; gap: 6px; border-radius: 14px; padding: 16px 18px; outline: 1.5px dashed rgba(28, 45, 74, .2); outline-offset: -7px; transition: background-color 240ms ease, outline-color 240ms ease; }
+.res.ok { background: var(--okBg); outline-color: rgba(30, 107, 63, .4); }
+.res.warn { background: var(--warnBg); outline-color: rgba(122, 66, 0, .35); }
+.res.bad { background: var(--badBg); outline-color: rgba(163, 36, 28, .35); }
+.res .what { font-size: 15px; font-weight: 600; }
+.res h3 { font-size: 1.6rem; transition: color 240ms ease; }
+.res.ok h3 { color: var(--okFg); } .res.warn h3 { color: var(--warnFg); } .res.bad h3 { color: var(--badFg); }
+
+/* Probador */
+.gpick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.gb { min-height: 62px; border: 2px solid var(--line); border-radius: 14px; background: var(--paper); display: flex; align-items: center; gap: 10px; padding: 8px 10px; font-size: 16px; font-weight: 600; text-align: left; line-height: 1.15; box-shadow: var(--lift); }
+.gb .gi { width: 38px; height: 38px; flex: none; }
+.gb .gi path { fill: #fff; stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; transition: stroke 200ms ease; }
+.gb[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.gb[aria-pressed="true"] .gi path { stroke: #fff; }
+.spoolgrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px 4px; }
+.sp { border: 0; background: none; border-radius: 14px; padding: 6px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 14px; color: var(--muted); transition: transform 220ms var(--ease-out), background-color 200ms ease, box-shadow 200ms ease, color 200ms ease; }
+.sp:active { transform: scale(.94); }
+.sp[aria-pressed="true"] { background: var(--paper); color: var(--ink); font-weight: 700; box-shadow: 0 0 0 2.5px var(--thread), var(--lift); transform: translateY(-3px); }
+.stage { position: relative; background: var(--paper); border-radius: 16px; height: 236px; display: flex; justify-content: center; align-items: flex-end; padding: 0 104px 10px 0; box-shadow: var(--lift); background-image: radial-gradient(120% 70% at 40% 100%, #F3F5F8 0, transparent 70%); }
+.stage .rail { position: absolute; top: 14px; left: 16px; right: 16px; height: 6px; border-radius: 3px; background: var(--wood); box-shadow: 0 1px 0 rgba(0,0,0,.18); }
+.stage .hanger { display: flex; flex-direction: column; align-items: center; }
+.stage .g { width: 170px; height: 170px; margin-top: -16px; filter: drop-shadow(0 6px 6px rgba(28, 45, 74, .12)); }
+.stage .hang { position: absolute; right: 18px; top: 20px; }
+.stage .hint { position: absolute; right: 14px; top: 46px; width: 92px; text-align: center; font-size: 14px; color: var(--muted); }
+
+/* No paga */
+.nogrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.nt { position: relative; border: 0; background: var(--paper); border-radius: 14px; padding: 12px; display: flex; align-items: center; gap: 10px; text-align: left; font-size: 15px; font-weight: 600; line-height: 1.15; min-height: 62px; box-shadow: var(--lift); }
+.nt .ico { width: 30px; height: 30px; color: var(--muted); }
+.nt .ban { position: absolute; top: 6px; left: 30px; width: 18px; height: 18px; border-radius: 50%; background: var(--badFg); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper); }
+.nt .ban .ico { width: 11px; height: 11px; color: #fff; }
+.nt .ban .ico path { stroke-width: 3.2; }
+
+/* Rendición */
+.tl { display: flex; flex-direction: column; }
+.tli { display: flex; gap: 12px; align-items: flex-start; position: relative; padding-bottom: 14px; }
+.tli::before { content: ""; position: absolute; left: 21px; top: 44px; bottom: 0; width: 0; border-left: 2px dashed var(--line); }
+.tli:last-child::before { display: none; }
+.tli .n { width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-family: var(--cond); font-weight: 800; font-size: 22px; flex: none; position: relative; z-index: 1; }
+.tli .t { flex: 1; display: flex; flex-direction: column; gap: 2px; padding-top: 2px; }
+.tli .t b { font-size: 18px; }
+
+/* Checklist: el visto se dibuja con un trazo; desmarcar es más rápido que marcar */
+.checks { display: flex; flex-direction: column; gap: 8px; }
+.ck { display: flex; align-items: center; gap: 12px; background: var(--paper); border: 2px solid transparent; border-radius: 14px; padding: 12px 14px; cursor: pointer; font-size: 16px; box-shadow: var(--lift); -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background-color 200ms ease, border-color 200ms ease; }
+.ck input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ck .box { width: 32px; height: 32px; border-radius: 9px; border: 2.5px solid var(--line); display: grid; place-items: center; color: #fff; flex: none; background: #fff; transition: transform 140ms var(--ease-out), background-color 200ms ease, border-color 200ms ease; }
+.ck:active .box { transform: scale(.9); }
+.ck .box .ico path { stroke-width: 2.8; stroke-dasharray: 21; stroke-dashoffset: 21; transition: stroke-dashoffset 120ms ease; }
+.ck:has(input:checked) { border-color: var(--okFg); background: var(--okBg); }
+.ck:has(input:checked) .box { background: var(--okFg); border-color: var(--okFg); }
+.ck:has(input:checked) .box .ico path { stroke-dashoffset: 0; transition: stroke-dashoffset 240ms var(--ease-out) 40ms; }
+.ck:has(input:focus-visible) { outline: 3px solid var(--thread); outline-offset: 2px; }
+.meter { display: flex; align-items: center; gap: 12px; }
+.meter .trk { flex: 1; height: 14px; border-radius: 14px; background: var(--paper); overflow: hidden; box-shadow: inset 0 1px 2px rgba(28, 45, 74, .14); }
+.meter .fill { width: 100%; height: 100%; background: var(--okFg); border-radius: 14px; transition: transform 420ms var(--ease-out); }
+.meter b { font-family: var(--cond); font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.done { display: flex; align-items: flex-start; gap: 16px; }
+
+/* Navegación */
+.nav { position: sticky; bottom: 0; z-index: 4; background: var(--ground); padding-block: 12px calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; border-top: 1px solid var(--line); box-shadow: 0 -12px 20px -16px rgba(28, 45, 74, .4); }
+.btn { min-height: 58px; border-radius: 12px; border: 2px solid var(--ink); background: transparent; padding: 0 16px; font-weight: 700; font-size: 17px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.primary { background: var(--ink); color: #fff; flex: 1; box-shadow: 0 2px 0 #0E1A30; }
+.btn .ico { transition: transform 200ms var(--ease-out); }
+footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+
+/* Hoja de detalle: entra con curva de cajón; sale más rápido; se puede bajar con el dedo */
+.scrim { position: fixed; inset: 0; background: rgba(28, 45, 74, .45); z-index: 20; opacity: 0; transition: opacity 200ms ease; }
+.scrim[data-open] { opacity: 1; transition-duration: 300ms; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; display: flex; justify-content: center; pointer-events: none; }
+.sheet-in { pointer-events: auto; width: 100%; max-width: 600px; max-height: 84vh; overflow-y: auto; overscroll-behavior: contain; background: var(--paper); border-radius: 22px 22px 0 0; padding: 0 max(22px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 -12px 40px rgba(28, 45, 74, .2); border-top: 6px solid var(--tape); transform: translateY(100%); transition: transform 420ms var(--ease-drawer); }
+.sheet[data-open] .sheet-in { transform: translateY(0); }
+.sheet[data-closing] .sheet-in { transition-duration: 240ms; }
+.sheet-hd { display: flex; flex-direction: column; gap: 12px; padding-top: 10px; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.sheet-hd:active { cursor: grabbing; }
+.grab { width: 44px; height: 5px; border-radius: 5px; background: var(--line); align-self: center; }
+.sheet-b { display: flex; flex-direction: column; gap: 10px; }
+.sheet-b ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.sheet-b li::marker { color: var(--thread); }
+.src { font-size: 14px; color: var(--muted); border-top: 1px dashed #CBD3DE; padding-top: 10px; }
+
+/* Hover solo con mouse: en el teléfono el toque no deja estados "pegados" */
+@media (hover: hover) and (pointer: fine) {
+  .cat:hover { box-shadow: 0 3px 0 var(--ink), 0 0 0 3px rgba(194, 65, 45, .35); }
+  .cat:hover .go .ico { transform: translateX(3px); }
+  .gb:hover:not([aria-pressed="true"]), .big:hover:not([aria-pressed="true"]) { border-color: var(--ink); }
+  .nt:hover { box-shadow: 0 0 0 2px var(--line), var(--lift); }
+  .sp:hover:not([aria-pressed="true"]) { background: rgba(255, 255, 255, .7); color: var(--ink); }
+  .more:hover, .textbtn:hover { color: var(--thread); }
+  .dunno:hover { border-color: var(--ink); background: rgba(255, 255, 255, .5); }
+  .btn:not(.primary):hover { background: rgba(28, 45, 74, .06); }
+  .btn.primary:hover { background: #26395C; }
+  .btn.primary:hover .ico { transform: translateX(3px); }
+  .sound:hover { border-color: var(--ink); }
+  .ck:hover:not(:has(input:checked)) { border-color: var(--line); }
+  .tape-nums button:hover { background: rgba(28, 45, 74, .08); }
+}
+
+/* Menos movimiento: se quitan desplazamientos y se dejan fundidos y colores, que ayudan a entender */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes enter { from { opacity: 0; } }
+  @keyframes drop { from { opacity: 0; transform: rotate(7deg); } to { opacity: 1; transform: rotate(7deg); } }
+  @keyframes sway { from { opacity: .4; transform: rotate(7deg); } to { opacity: 1; transform: rotate(7deg); } }
+  button:active, .cat:active, .btn:active, .nt:active, .sp:active, .ck:active .box { transform: none; }
+  .sp[aria-pressed="true"] { transform: none; }
+  .tape-done, .pin-track, .meter .fill { transition: none; }
+  .sheet-in { transform: none; opacity: 0; transition: opacity 200ms ease; }
+  .sheet[data-open] .sheet-in { transform: none; opacity: 1; }
+}
+</style>
+
+<div class="wrap">
+  <div class="tape" id="tape" hidden>
+    <div class="tape-in">
+      <div class="tape-bar"><div class="tape-done" id="tapedone" style="transform:scaleX(.0714)"></div></div>
+      <div class="tape-nums" id="tapenums"></div>
+      <div class="pin-track" id="pintrack" style="transform:translateX(7.14%)"><div class="pin"><b id="pinnum">1</b><i></i></div></div>
+    </div>
+  </div>
+  <header class="top" id="top">
+    <div class="toprow">
+      <span class="hwrap"><a class="homebtn" href="./" aria-label="Volver a la portada"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.75 10.5L12 4l8.25 6.5M5.75 9v10.25h4.5v-5.5h3.5v5.5h4.5V9"/></svg></a><span class="stepname" id="stepname">Mi uniforme 2026</span></span>
+      <button type="button" class="sound" id="sound" aria-pressed="true"></button>
+    </div>
+    <div class="catrow" id="catrow" hidden></div>
+  </header>
+
+  <main id="main" tabindex="-1"></main>
+  <div class="nav" id="nav" hidden></div>
+
+  <footer>
+    <p>Guía de la Asociación de Funcionarios Municipales de Lago Ranco. Se basa en el Reglamento de Entrega y Uso de Uniforme Institucional (Decreto Exento N° 2.612, de 2026) y en el Decreto Exento N° 3.080, de 22 de octubre de 2026.</p>
+    <p>Si algo no calza, vale lo que dice el Reglamento.</p>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-t" hidden>
+  <div class="sheet-in" id="sheet-in" tabindex="-1">
+    <div class="sheet-hd" id="sheet-hd">
+      <div class="grab" aria-hidden="true"></div>
+      <h2 id="sheet-t"></h2>
+    </div>
+    <div class="sheet-b" id="sheet-b"></div>
+    <p class="src" id="sheet-s"></p>
+    <button type="button" class="btn primary" id="sheet-x">Entendido</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Íconos ---------- */
+  var IC = {
+    info: "M12 2.75a9.25 9.25 0 1 0 0 18.5a9.25 9.25 0 1 0 0-18.5M12 11v5.5M12 7.75h.01",
+    help: "M12 2.75a9.25 9.25 0 1 0 0 18.5a9.25 9.25 0 1 0 0-18.5M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2-2.4 3.5M12 16.75h.01",
+    soundOn: "M4.5 9.5h3l4.5-4v13l-4.5-4h-3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM15.5 9.2a4 4 0 0 1 0 5.6M18.2 6.6a7.8 7.8 0 0 1 0 10.8",
+    soundOff: "M4.5 9.5h3l4.5-4v13l-4.5-4h-3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM16 9.5l5 5M21 9.5l-5 5",
+    check: "M5 12.5l4.5 4.5L19 7.5",
+    x: "M6.5 6.5l11 11M17.5 6.5l-11 11",
+    alert: "M10.3 4.3L2.9 17.2a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0zM12 9.5v4.25M12 16.75h.01",
+    arrowR: "M5 12h14M13 6l6 6-6 6",
+    arrowL: "M19 12H5M11 6l-6 6 6 6",
+    chev: "M9 6l6 6-6 6",
+    undo: "M9 6.5L4.5 11 9 15.5M4.5 11h10a4.75 4.75 0 0 1 0 9.5H12",
+    coin: "M12 3.25a8.75 8.75 0 1 0 0 17.5a8.75 8.75 0 1 0 0-17.5M14.6 9.1c-.5-.9-1.4-1.35-2.6-1.35-1.6 0-2.6.8-2.6 2 0 2.8 5.3 1.6 5.3 4.5 0 1.25-1.1 2.1-2.75 2.1-1.25 0-2.3-.5-2.85-1.5M12 6.25v1.5M12 16.4v1.35",
+    calendar: "M5.25 5h13.5a1.75 1.75 0 0 1 1.75 1.75v12a1.75 1.75 0 0 1-1.75 1.75H5.25A1.75 1.75 0 0 1 3.5 18.75v-12A1.75 1.75 0 0 1 5.25 5zM3.5 9.75h17M8 3v4M16 3v4M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01",
+    hanger: "M12 7.25a2.25 2.25 0 1 1 2.25-2.25c0 1.3-2.25 1.6-2.25 3.25M12 8.25l-8.6 6.6c-.8.6-.4 1.9.6 1.9h16c1 0 1.4-1.3.6-1.9z",
+    helmet: "M3.25 16.25h17.5v2.25H3.25zM5 16.25a7 7 0 0 1 14 0M10.5 9.6V7h3v2.6",
+    cardX: "M4.5 5.75h15a1.75 1.75 0 0 1 1.75 1.75v9a1.75 1.75 0 0 1-1.75 1.75h-15A1.75 1.75 0 0 1 2.75 16.5v-9A1.75 1.75 0 0 1 4.5 5.75zM2.75 9.75h18.5M14.5 13.25l3 3M17.5 13.25l-3 3",
+    lost: "M4.5 5.75h15a1.75 1.75 0 0 1 1.75 1.75v9a1.75 1.75 0 0 1-1.75 1.75h-15A1.75 1.75 0 0 1 2.75 16.5v-9A1.75 1.75 0 0 1 4.5 5.75zM2.75 9.75h18.5M6.5 14.5h4",
+    clock: "M12 3.25a8.75 8.75 0 1 0 0 17.5a8.75 8.75 0 1 0 0-17.5M12 7.5V12l3 2",
+    tagX: "M3.5 11.6V4.75A1.25 1.25 0 0 1 4.75 3.5h6.85l8.9 8.9-8.1 8.1zM8 6.75a1.25 1.25 0 1 0 0 2.5a1.25 1.25 0 1 0 0-2.5M12.25 12.75l3.5 3.5M15.75 12.75l-3.5 3.5",
+    star: "M12 3.5l2.45 5 5.5.7-4 3.75 1.05 5.45L12 15.75 7 18.4l1.05-5.45-4-3.75 5.5-.7z",
+    badge: "M12 3.25a6.25 6.25 0 1 0 0 12.5a6.25 6.25 0 1 0 0-12.5M12 6.75l.9 1.85 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3zM8.75 14.75l-1.25 6 4.5-2.25 4.5 2.25-1.25-6",
+    underwear: "M3.5 6.5h17v3.25c-3.9 1.5-6.1 4.7-6.6 8.75h-3.8c-.5-4.05-2.7-7.25-6.6-8.75z",
+    swim: "M8 3.5v4.25c2.4 1.9 5.6 1.9 8 0V3.5M8 7.75c-.9 4-.1 6.6 1.4 8.2l-.9 4.55h7l-.9-4.55c1.5-1.6 2.3-4.2 1.4-8.2",
+    bowtie: "M3.25 7.75l7 3.5-7 3.5zM20.75 7.75l-7 3.5 7 3.5zM10.25 9.75h3.5v3h-3.5z",
+    bag: "M5.25 8.25h13.5l-1.3 11.6a1.5 1.5 0 0 1-1.5 1.4H8.05a1.5 1.5 0 0 1-1.5-1.4zM9 8.25V7a3 3 0 0 1 6 0v1.25",
+    perfume: "M8 10h8a2 2 0 0 1 2 2v7.5a1.25 1.25 0 0 1-1.25 1.25H7.25A1.25 1.25 0 0 1 6 19.5V12a2 2 0 0 1 2-2zM10 10V7h4v3M9.25 4.25h5.5",
+    sandal: "M3.75 17.25c0-1.6 1.1-2.75 3.1-2.75h10.3c2 0 3.1 1.15 3.1 2.75v1.5H3.75zM8 14.5l2.5-6 3 6M15.75 14.5V9.75",
+    sneaker: "M3.25 17.5v-5.75l3.9-4.4 3 2.5 3.6 1.4h4.1c1.6 0 2.9 1.3 2.9 2.9v3.35zM3.25 17.5h17.5M8 13.6c3.1 1 6.1 1 9.1-.9",
+    plug: "M9 3.25v4M15 3.25v4M6.5 7.25h11v3.25a5.5 5.5 0 0 1-11 0zM12 16v4.75",
+    building: "M3 9.5L12 4l9 5.5M5 9.5v9M19 9.5v9M9 11.75v5.5M12 11.75v5.5M15 11.75v5.5M3 19.75h18",
+    truck: "M2.75 16.25V7.5h10.75v8.75M13.5 10.25h4l3.25 3.4v2.6h-2.1M9.1 16.25h4.4M7 15.1a1.9 1.9 0 1 0 0 3.8a1.9 1.9 0 1 0 0-3.8M16.75 15.1a1.9 1.9 0 1 0 0 3.8a1.9 1.9 0 1 0 0-3.8"
+  };
+  function ic(n, cls) { return '<svg class="ico' + (cls ? " " + cls : "") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + IC[n] + '"/></svg>'; }
+
+  /* ---------- Prendas ---------- */
+  function lum(hex) { var n = parseInt(hex.slice(1), 16); return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
+  var BODY = {
+    jacket: "M40 22 L24 28 L12 48 L6 102 L21 104 L27 62 L29 114 L91 114 L93 62 L99 104 L114 102 L108 48 L96 28 L80 22 Q72 32 60 32 Q48 32 40 22 Z",
+    shirt: "M42 16 L26 22 L8 40 L20 56 L31 48 L31 108 L89 108 L89 48 L100 56 L112 40 L94 22 L78 16 Q72 28 60 28 Q48 28 42 16 Z",
+    sweater: "M42 16 L26 22 L14 44 L8 98 L22 100 L28 58 L30 108 L90 108 L92 58 L98 100 L112 98 L106 44 L94 22 L78 16 Q72 26 60 26 Q48 26 42 16 Z",
+    pants: "M32 8 H88 L93 112 H66 L60 46 L54 112 H27 Z",
+    skirt: "M38 14 H82 L100 106 H20 Z",
+    shoe: "M12 78 Q12 56 28 54 L50 50 Q60 48 66 58 Q76 70 94 72 Q112 74 112 88 L112 94 L12 94 Z"
+  };
+  var DET = {
+    parka: "M46 26 Q60 16 74 26 M60 33 V113 M35 84 H51 M69 84 H85 M8 94 L21 96 M99 96 L112 94 M29 104 H91",
+    jacket: "M40 22 L52 46 L60 34 L68 46 L80 22 M60 34 V113 M36 80 L50 76 M70 76 L84 80",
+    shirt: "M42 16 L52 32 L60 26 L68 32 L78 16 M60 30 V107 M70 48 H82 V58 H70 Z",
+    sweater: "M44 18 Q60 34 76 18 M31 100 H89 M10 90 L23 92 M97 92 L110 90",
+    pants: "M32 18 H88 M60 18 V40 M37 18 Q41 30 49 30 M83 18 Q79 30 71 30 M44 44 L41 110 M76 44 L79 110",
+    jeans: "M32 18 H88 M60 18 V42 M36 18 Q40 32 50 32 M84 18 Q80 32 70 32 M64 22 H74 V28 M29 104 H54 M66 104 H92",
+    skirt: "M38 24 H82 M52 26 L44 104 M68 26 L76 104",
+    shoe: "M46 56 L54 66 M54 53 L61 62 M30 60 Q36 70 34 92 M70 74 Q90 82 110 82"
+  };
+  function key(k) { return k === "parka" ? "jacket" : k === "jeans" ? "pants" : k; }
+  function garment(kind, hex) {
+    var fill = hex || "#FFFFFF", ol = 'stroke="#1C2D4A" stroke-width="2.6" stroke-linejoin="round"';
+    var dk = hex ? (lum(hex) < 0.5 ? "rgba(255,255,255,.5)" : "rgba(28,45,74,.32)") : "#C9D4DC";
+    var s = "";
+    if (kind === "parka") s += '<path class="dye" d="M42 24 Q40 4 60 4 Q80 4 78 24" fill="' + fill + '" ' + ol + '/>';
+    s += '<path class="dye" d="' + BODY[key(kind)] + '" fill="' + fill + '" ' + ol + '/>';
+    if (kind === "shoe") s += '<path d="M8 94 H116 V100 Q116 106 110 106 H14 Q8 106 8 100 Z" fill="#1C2D4A" ' + ol + '/>';
+    s += '<path class="det" d="' + DET[kind] + '" fill="none" stroke="' + dk + '" stroke-width="2.2" stroke-linecap="round"/>';
+    return '<svg class="g" viewBox="0 0 120 120" aria-hidden="true">' + s + "</svg>";
+  }
+  function silhouette(kind) {
+    var s = (kind === "parka" ? '<path d="M42 24 Q40 4 60 4 Q80 4 78 24"/>' : "") + '<path d="' + BODY[key(kind)] + '"/>' + (kind === "shoe" ? '<path d="M8 94 H116 V100 Q116 106 110 106 H14 Q8 106 8 100 Z"/>' : "");
+    return '<svg class="gi" viewBox="0 0 120 120" aria-hidden="true">' + s + "</svg>";
+  }
+  function spool(hex, w) {
+    w = w || 44; var h = Math.round(w * 56 / 44);
+    return '<svg viewBox="0 0 44 56" width="' + w + '" height="' + h + '" aria-hidden="true"><rect x="2" y="2" width="40" height="7" rx="2.5" fill="#B88B55"/><rect x="7" y="9" width="30" height="38" fill="' + hex + '" stroke="#C7D0DB" stroke-width=".8"/><path d="M7 16h30M7 23h30M7 30h30M7 37h30" stroke="' + (lum(hex) < 0.5 ? "rgba(255,255,255,.16)" : "rgba(0,0,0,.1)") + '" stroke-width="1.2"/><rect x="2" y="47" width="40" height="7" rx="2.5" fill="#B88B55"/></svg>';
+  }
+
+  var SW = { azulmarino: ["Azul marino", "#1F2B4A"], azul: ["Azul", "#2F5DA8"], celeste: ["Celeste", "#8FC4E8"], blanco: ["Blanco", "#FFFFFF"], negro: ["Negro", "#1B1B1B"], gris: ["Gris", "#9C9FA1"], cafe: ["Café", "#6B4A2B"], beige: ["Beige", "#D9C8A7"], amarillo: ["Amarillo", "#E3B33C"], verde: ["Verde", "#3E7B4E"] };
+  var COLORS = ["azulmarino", "azul", "celeste", "blanco", "negro", "gris", "cafe", "beige", "amarillo", "verde"];
+  function dot(k) { return '<span class="dot" style="background:' + SW[k][1] + '" title="' + SW[k][0] + '"></span>'; }
+
+  var CAT = {
+    a: { short: "Categoría a)", long: "Oficina y terreno", where: "En oficina, y a veces en terreno", ex: "Oficina, atención de público, profesionales, técnicos y jefaturas.", icon: "building", min: 2,
+      saldo: [["pants", "Pantalón formal"], ["jeans", "Jeans"], ["skirt", "Falda"], ["skirt", "Vestido formal"], ["shirt", "Blusa"], ["shirt", "Camisa"], ["shirt", "Polera piqué"], ["sweater", "Beatle"], ["jacket", "Blazer"], ["jacket", "Chaqueta"], ["parka", "Abrigo"], ["jacket", "Cortaviento"], ["sweater", "Sweater"], ["sweater", "Chaleco"], ["sweater", "Polar"], ["shoe", "Calzado formal"]] },
+    b: { short: "Categoría b)", long: "Operativo de terreno", where: "En terreno, vehículos o caminos", ex: "Conductores, maquinaria, mantención, aseo, áreas verdes y emergencia.", icon: "truck", min: 3,
+      saldo: [["pants", "Pantalón formal"], ["jeans", "Jeans"], ["shirt", "Camisa"], ["shirt", "Polera piqué"], ["sweater", "Beatle"], ["jacket", "Chaqueta"], ["jacket", "Cortaviento"], ["sweater", "Sweater"], ["sweater", "Chaleco"], ["sweater", "Polar"], ["parka", "Abrigo o impermeable"], ["shoe", "Calzado de trabajo"]] }
+  };
+  var STEPS = ["tu categoría", "lo obligatorio", "la parka 2026", "probador de colores", "lo que no paga", "la rendición", "antes de pagar"];
+
+  function blue(c) { return c === "azulmarino" || c === "azul" || c === "celeste"; }
+  var GARMENTS = [
+    { id: "parka", art: "parka", name: function () { return "Parka obligatoria"; }, detail: "La parka es azul marino. Solo en 2026 puede ser negra o café si no encuentras azul marino (Decreto Exento N° 3.080).", rule: function (c) {
+      if (c === "azulmarino") return ["ok", "Es el color que pide el Reglamento. Puedes comprarla."];
+      if (c === "negro" || c === "cafe") return ["warn", "Solo sirve en 2026 y solo si no encontraste azul marino. Guarda una foto o el aviso del vendedor."];
+      if (c === "azul" || c === "celeste") return ["warn", "El decreto pide azul marino. Otro tono de azul no está previsto: pregunta a tu jefatura antes de comprar."];
+      return ["bad", "La parka solo puede ser azul marino o, si no hay, negra o café."]; } },
+    { id: "exterior", art: "jacket", name: function () { return "Chaqueta o polar"; }, detail: "En la prenda exterior debe predominar la familia azul: celeste, azul o azul marino (artículo 5°).", rule: function (c) {
+      if (blue(c)) return ["ok", "La familia azul es la que corresponde a la prenda exterior."];
+      if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
+      return ["warn", "En la prenda exterior debe predominar el azul. Pregunta a tu jefatura antes de comprar."]; } },
+    { id: "superior", art: "shirt", name: function (k) { return k === "a" ? "Camisa, blusa o polera" : "Camisa o polera"; }, detail: "La prenda de uso diario debe ser de la familia azul. El blanco y el negro sirven como contraste (artículo 5°).", rule: function (c) {
+      if (blue(c)) return ["ok", "La prenda de todos los días debe ser de la familia azul."];
+      if (c === "blanco" || c === "negro") return ["warn", "Debe predominar el azul; el blanco y el negro sirven como contraste. Pregunta antes de comprar."];
+      return ["bad", "Este color solo sirve como detalle, no como color principal."]; } },
+    { id: "inferior", art: "pants", name: function (k) { return k === "a" ? "Pantalón, falda o vestido" : "Pantalón"; }, detail: "La prenda inferior puede ser de la familia azul o de un color básico como el negro o el blanco (artículo 5°, letra a).", rule: function (c) {
+      if (blue(c) || c === "negro" || c === "blanco") return ["ok", "La familia azul o un color básico como el negro sirven aquí."];
+      if (c === "gris" || c === "cafe" || c === "beige") return ["warn", "Es un color secundario y no puede ser el principal. Pregunta a tu jefatura."];
+      return ["bad", "Este color no puede ser el principal de una prenda."]; } },
+    { id: "jeans", art: "jeans", name: function () { return "Jeans"; }, detail: "Solo azul o negro liso, sin decoloración, rasgaduras, tachas, bordados ni desgaste (artículo 6°).", rule: function (c) {
+      if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Sirve si es liso: sin rasgaduras, decoloración ni tachas."];
+      if (c === "celeste") return ["warn", "Un jeans celeste suele ser deslavado, y eso no se permite. Mejor azul o negro liso."];
+      return ["bad", "Los jeans solo pueden ser azul o negro liso."]; } },
+    { id: "calzado", art: "shoe", name: function () { return "Zapato o zapatilla"; }, detail: "Colores neutros o institucionales; si es zapatilla, outdoor y sin logos deportivos llamativos (artículo 5° y Decreto Exento N° 3.080).", rule: function (c) {
+      if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
+      if (c === "amarillo") return ["warn", "Un calzado entero amarillo puede ser observado. Pregunta antes de comprar."];
+      return ["ok", "Color neutro o institucional. Si es zapatilla, que sea outdoor y sin logos deportivos llamativos."]; } },
+    { id: "secundaria", art: "sweater", name: function (k) { return k === "a" ? "Sweater, chaleco o blazer" : "Sweater o chaleco"; }, detail: "Prenda secundaria: admite azul, blanco o negro, y también gris, café, beige o amarillo (artículo 5°).", rule: function (c) {
+      if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
+      return ["ok", "Sirve como prenda secundaria."]; } }
+  ];
+  var VERD = { ok: ["check", "Sirve", "Sí, sirve"], warn: ["alert", "Consulta", "Pregunta antes de comprar"], bad: ["x", "No sirve", "No sirve para esta prenda"] };
+
+  /* ---------- Fichas de detalle ---------- */
+  var INFO = {
+    categoria: ["¿Cómo sé mi categoría?", "<p>Se define por lo que haces de verdad en tu trabajo, no por tu cargo ni por si eres de planta o a contrata.</p><ul><li>La fija la Municipalidad en una nómina, con Recursos Humanos y tu jefatura.</li><li>Manejar de vez en cuando un vehículo menor no te pasa a la categoría b).</li><li>El Alcalde queda en la categoría a).</li><li>Los inspectores de seguridad municipal quedan en la b), por ahora.</li></ul><p><b>Si no sabes en cuál quedaste, pregunta a tu jefatura o a Recursos Humanos antes de comprar.</b></p>", "Reglamento, artículos 6°, 7°, 11° y 30°."],
+    parka: ["Parka impermeable térmica", "<p>Es obligatoria para las dos categorías: 1 parka azul marino.</p><p>Solo en 2026 puede ser otra prenda exterior y, si no hay azul marino, negra o café. Lo ves en el paso 3.</p><p>Desde 2027 se vuelve a exigir la parka impermeable térmica azul marino.</p>", "Reglamento, artículos 6° y 31° (Decreto Exento N° 3.080)."],
+    zapato: ["Zapato o zapatilla outdoor", "<p>Es obligatorio para las dos categorías. Desde el Decreto Exento N° 3.080 también sirve la zapatilla outdoor.</p><ul><li>Colores neutros o institucionales.</li><li>Sin logos de marcas deportivas llamativos.</li><li>Control puede pedirte una foto.</li><li>Las zapatillas de running, fútbol o de moda no sirven.</li></ul>", "Reglamento, artículos 5°, 6° y 8° letra d)."],
+    pantalon: ["Pantalón outdoor", "<p>Obligatorio solo para la categoría b). Resistente y apto para terreno, en la familia azul o un color básico.</p><p>No puede tener protección técnica: si tu tarea la necesita, eso es EPP y lo entrega la Municipalidad.</p>", "Reglamento, artículos 5° y 6° letra b)."],
+    saldo: ["Lo que compras con el saldo", "<p>Después de las prendas obligatorias, compras lo que quieras de la lista, dentro del saldo y en colores institucionales.</p><ul><li>Jeans: azul o negro liso, sin rasgaduras, decoloración ni tachas.</li><li>En la categoría b) la lista no incluye falda, vestido, blusa, blazer ni abrigo. Si los necesitas, pregunta a tu jefatura.</li></ul>", "Reglamento, artículo 6°."],
+    monto: ["La tarjeta", "<ul><li>Monto: 6 UTM por funcionario, igual para las dos categorías.</li><li>Es personal y solo sirve para el uniforme.</li><li>No se cambia por dinero.</li><li>El saldo que no uses se pierde: no se acumula ni se devuelve.</li></ul>", "Reglamento, artículos 9° y 24°."],
+    parka26: ["La excepción de 2026", "<p>Solo para la compra de 2026, la parka impermeable térmica se puede reemplazar por:</p><ul><li>una parka común (no necesita ser impermeable ni térmica),</li><li>una chaqueta,</li><li>una chaqueta impermeable, o</li><li>un cortaviento.</li></ul><p>Debe ser azul marino. Solo si no hay en azul marino, puede ser negra o café.</p><p>Debe llevar el logo municipal o el pin, igual que el resto del uniforme.</p>", "Decreto Exento N° 3.080, de 22 de octubre de 2026."],
+    respaldo: ["Guarda un respaldo", "<p>Si compras negro o café, saca una foto de la tienda sin azul marino o guarda el aviso del vendedor.</p><p>El decreto no lo exige, pero te ayuda si te hacen observaciones en la rendición.</p>", "Recomendación de la Asociación."],
+    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> el color principal, sobre todo en la prenda de afuera y en la de todos los días.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>En terreno se pueden usar otros colores por seguridad, si la jefatura lo autoriza.</p>", "Reglamento, artículo 5°."],
+    reglas: ["En todas las prendas", "<ul><li>Sin marcas, logos ni estampados grandes que no sean de la Municipalidad.</li><li>Que no se parezcan al uniforme de Carabineros, Fuerzas Armadas, bomberos o seguridad.</li><li>Durante la jornada llevas el logo municipal en una prenda o el pin oficial.</li></ul>", "Reglamento, artículos 4° y 5°."],
+    interior: ["Ropa interior", "<p>No se puede comprar con la tarjeta: no es parte del uniforme.</p>", "Reglamento, artículo 8° letra a)."],
+    bano: ["Traje de baño y ropa deportiva", "<p>No se pueden comprar con la tarjeta.</p>", "Reglamento, artículo 8° letra b)."],
+    fiesta: ["Ropa de fiesta", "<p>No se puede comprar con la tarjeta, como tampoco ropa para fuera del trabajo.</p>", "Reglamento, artículo 8° letra b)."],
+    bolso: ["Carteras y mochilas", "<p>No se pueden comprar con la tarjeta, como tampoco accesorios ni artículos de moda.</p>", "Reglamento, artículo 8° letra c)."],
+    perfume: ["Joyas y perfumes", "<p>No se pueden comprar con la tarjeta, como tampoco cosméticos.</p>", "Reglamento, artículo 8° letra c)."],
+    sandalia: ["Sandalias", "<p>No se pueden comprar con la tarjeta.</p>", "Reglamento, artículo 8° letra d)."],
+    deportiva: ["Zapatillas deportivas o de moda", "<p>No sirven las de running, fútbol u otro deporte, ni las de moda.</p><p>Sí sirve la zapatilla outdoor de color neutro y sin logos deportivos llamativos.</p>", "Reglamento, artículo 8° letra d)."],
+    hogar: ["Cosas del hogar", "<p>No se pueden comprar electrodomésticos, artículos del hogar ni aparatos electrónicos.</p>", "Reglamento, artículo 8° letra e)."],
+    epp: ["Elementos de protección personal (EPP)", "<p>Botas de seguridad, cascos, chalecos reflectantes y ropa de agua para faena <b>no</b> se compran con la tarjeta.</p><ul><li>Los entrega gratis la Municipalidad.</li><li>Se entregan según el riesgo real de tu tarea.</li><li>Pídelos a tu jefatura o a Prevención de Riesgos.</li></ul>", "Reglamento Específico de EPP (Decreto Exento N° 2.611, de 2026)."],
+    prohibido: ["La tarjeta no se presta", "<p>No puedes vender, prestar ni cambiar por dinero la tarjeta o las prendas.</p><p>Las prendas son de la Municipalidad y se devuelven al dejar el cargo.</p>", "Reglamento, artículos 2°, 15° y 16°."],
+    boleta: ["Compra con boleta detallada", "<p>Pide boleta o factura con el detalle de cada prenda. Si no lo trae, anota tú qué compraste.</p>", "Reglamento, artículo 19°."],
+    formulario: ["El formulario", "<p>Lo entrega la Dirección de Control. Anotas cada prenda con su color, cantidad y valor, y firmas que corresponden a tu categoría.</p>", "Reglamento, artículo 19°."],
+    visacion: ["Tu jefatura lo visa", "<p>Tu jefatura revisa que las prendas sean de tu categoría, tengan los colores correctos y que tengas logo o pin. Si algo no calza, te pide corregirlo.</p>", "Reglamento, artículo 20°."],
+    control: ["Control lo revisa", "<p>La Dirección de Control compara el formulario con la boleta y certifica la rendición o te hace observaciones.</p>", "Reglamento, artículo 21°."],
+    plazo: ["Plazo para rendir en 2026", "<p>La Dirección de Control fijará la fecha por escrito. No puede ser menos de 60 días desde que recibes la tarjeta.</p><p>La Asociación avisará apenas se informe.</p>", "Reglamento, artículo 18°."],
+    observaciones: ["Si te hacen observaciones", "<p>Tienes 10 días hábiles para corregir o aclarar.</p><p>Si no corriges, o no rindes a tiempo, debes devolver el monto en Tesorería en 10 días hábiles. Si no lo haces, te pueden pedir autorización para descontarlo del sueldo (hasta un 15%), y puede haber sumario.</p>", "Reglamento, artículos 22° y 23°."],
+    robo: ["Si pierdes la tarjeta", "<p>Avisa de inmediato a Recursos Humanos para bloquearla. Lo comprado antes de tu aviso no lo cubre la Municipalidad.</p>", "Reglamento, artículo 25°."]
+  };
+
+  /* ---------- Sonido: suave y profundo (tonos graves, ataque lento, sala cálida) ---------- */
+  var store = {
+    get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  };
+  var soundOn = store.get("mu26-sound") !== "off";
+  var AU = null;
+  function audio() {
+    if (!soundOn) return null;
+    try {
+      if (!AU) {
+        var C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+        var ctx = new C();
+        var master = ctx.createGain(); master.gain.value = 1.4;
+        var warm = ctx.createBiquadFilter(); warm.type = "lowpass"; warm.frequency.value = 4200; warm.Q.value = 0.3;
+        var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -22; comp.ratio.value = 3;
+        master.connect(warm); warm.connect(comp); comp.connect(ctx.destination);
+        var len = Math.floor(ctx.sampleRate * 2.4), imp = ctx.createBuffer(2, len, ctx.sampleRate);
+        for (var ch = 0; ch < 2; ch++) { var d = imp.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.4); }
+        var verb = ctx.createConvolver(); verb.buffer = imp;
+        var wet = ctx.createGain(); wet.gain.value = 0.34;
+        var send = ctx.createGain(); send.gain.value = 0.7;
+        send.connect(verb); verb.connect(wet); wet.connect(warm);
+        AU = { ctx: ctx, master: master, send: send };
+      }
+      if (AU.ctx.state === "suspended") AU.ctx.resume();
+      return AU;
+    } catch (e) { return null; }
+  }
+  /* Sonidos originales: piano cálido y celesta, en mi bemol mayor, con aire de vals nocturno.
+     Cada situación tiene su propia frase; nada se toma de canciones existentes. */
+  function n2f(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function piano(m, at, dur, vel, soft) {
+    var a = audio(); if (!a) return;
+    var ctx = a.ctx, t = ctx.currentTime + 0.02 + at, f = n2f(m);
+    var out = ctx.createGain(), lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.Q.value = 0.5;
+    lp.frequency.setValueAtTime(Math.min(f * 7, 6000), t);
+    lp.frequency.exponentialRampToValueAtTime(Math.max(f * 1.6, 220), t + dur * 0.7);
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vel, t + (soft ? 0.018 : 0.007));
+    out.gain.exponentialRampToValueAtTime(vel * 0.38, t + 0.26);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    lp.connect(out); out.connect(a.master); out.connect(a.send);
+    [[1, 1], [2, 0.42], [3, 0.14], [4, 0.07], [5, 0.03]].forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain(), k = p[0];
+      o.type = "sine"; o.frequency.value = f * k * (1 + 0.00035 * k * k);
+      g.gain.setValueAtTime(p[1], t); g.gain.exponentialRampToValueAtTime(p[1] * 0.02, t + dur / Math.pow(k, 0.7));
+      o.connect(g); g.connect(lp); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  function celesta(m, at, dur, vel) {
+    var a = audio(); if (!a) return;
+    var ctx = a.ctx, t = ctx.currentTime + 0.02 + at, f = n2f(m);
+    var out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vel, t + 0.004);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    out.connect(a.master); out.connect(a.send);
+    [[1, 1], [3.98, 0.2], [8.9, 0.035]].forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain(), k = p[0];
+      o.type = "sine"; o.frequency.value = f * k;
+      g.gain.setValueAtTime(p[1], t); g.gain.exponentialRampToValueAtTime(p[1] * 0.01, t + dur / Math.pow(k, 0.8));
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  function pad(m, at, dur, vel) {
+    var a = audio(); if (!a) return;
+    var ctx = a.ctx, t = ctx.currentTime + 0.02 + at, f = n2f(m);
+    var out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vel, t + 0.14);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    out.connect(a.master); out.connect(a.send);
+    [[1, 1, "sine"], [1.004, 0.5, "triangle"], [0.5, 0.35, "sine"]].forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = p[2]; o.frequency.value = f * p[0]; g.gain.value = p[1];
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  function roll(ms, at, gap, dur, vel) { ms.forEach(function (m, i) { piano(m, at + i * gap, dur, vel, true); }); }
+  /* Cierre: tres compases de vals (bajo en el 1, acorde en el 2 y el 3) que terminan en mi bemol */
+  function waltz() {
+    var b = 0.3;
+    piano(44, 0, 1.2, 0.07, true); roll([60, 63, 67], b, 0.012, 0.5, 0.04); roll([60, 63, 67], 2 * b, 0.012, 0.5, 0.035);
+    piano(75, 0, 0.9, 0.08); piano(74, 2 * b, 0.55, 0.07);
+    piano(46, 3 * b, 1.2, 0.07, true); roll([56, 62, 65], 4 * b, 0.012, 0.5, 0.04); roll([56, 62, 65], 5 * b, 0.012, 0.5, 0.035);
+    piano(72, 3 * b, 0.55, 0.075); piano(74, 4 * b, 0.55, 0.075); piano(77, 5 * b, 0.55, 0.075);
+    piano(39, 6 * b, 3, 0.08, true); roll([55, 58, 62, 65], 6 * b + 0.02, 0.05, 2.8, 0.05); piano(79, 6 * b + 0.04, 2.6, 0.085);
+    celesta(82, 6 * b + 0.25, 2, 0.04); celesta(86, 6 * b + 0.38, 2, 0.035);
+    pad(39, 6 * b, 3.2, 0.05);
+  }
+  var TICK = [63, 65, 67, 70, 72, 75, 77, 79, 82]; /* cada punto marcado sube un peldaño */
+  function play(n, k) {
+    switch (n) {
+      case "tap": piano(58, 0, 0.7, 0.09, true); break;
+      case "next": piano(58, 0, 0.6, 0.08, true); piano(63, 0.085, 0.9, 0.09, true); break;
+      case "back": piano(63, 0, 0.6, 0.08, true); piano(58, 0.085, 0.9, 0.08, true); break;
+      case "category": roll([39, 46, 50, 55, 65], 0, 0.065, 2.4, 0.07); celesta(82, 0.38, 1.6, 0.05); pad(39, 0, 2.6, 0.05); break;
+      case "ok": piano(43, 0, 1.8, 0.06, true); roll([55, 58, 62], 0, 0.03, 1.6, 0.065); celesta(79, 0.12, 1.4, 0.05); celesta(82, 0.24, 1.6, 0.045); break;
+      case "warn": piano(41, 0, 1.8, 0.065, true); roll([51, 56, 58], 0.02, 0.03, 1.4, 0.06); piano(60, 0.3, 1.4, 0.07, true); break;
+      case "bad": piano(44, 0, 1.8, 0.07, true); roll([55, 60], 0.02, 0.04, 1.2, 0.055); piano(63, 0.04, 0.8, 0.07, true); piano(60, 0.3, 1.4, 0.07, true); break;
+      case "open": celesta(70, 0, 1.2, 0.05); celesta(77, 0.09, 1.4, 0.045); break;
+      case "close": piano(62, 0, 0.6, 0.06, true); break;
+      case "tick": var m = TICK[Math.max(0, Math.min(TICK.length - 1, (k || 1) - 1))]; piano(m, 0, 1.1, 0.085, true); celesta(m + 12, 0.01, 0.8, 0.025); break;
+      case "untick": piano(56, 0, 0.6, 0.06, true); break;
+      case "pop": piano(k || 63, 0, 0.9, 0.08, true); break;
+      case "done": waltz(); break;
+      case "on": piano(63, 0, 0.8, 0.08, true); piano(67, 0.1, 1, 0.08, true); celesta(82, 0.2, 1.2, 0.04); break;
+    }
+  }
+
+  /* ---------- Estado ---------- */
+  var state = { cat: store.get("mu26-cat"), step: 0, parka: null, garment: "parka", color: null, checks: {} };
+  if (state.cat !== "a" && state.cat !== "b") state.cat = null;
+  try { state.checks = JSON.parse(store.get("mu26-checks") || "{}") || {}; } catch (e) { state.checks = {}; }
+  var main = document.getElementById("main");
+  var RM = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+  function $(id) { return document.getElementById(id); }
+  function anim(el, frames, ms, opts) {
+    if (!el || !el.animate) return null;
+    try { var o = { duration: ms, easing: EASE_OUT }; if (opts) for (var k in opts) o[k] = opts[k]; return el.animate(frames, o); } catch (e) { return null; }
+  }
+  /* Cuando cambia un texto, un desenfoque breve une el estado anterior con el nuevo */
+  function morph(el) { anim(el, [{ opacity: 0.55, filter: "blur(2px)" }, { opacity: 1, filter: "blur(0px)" }], 220); }
+  function rise(el) { anim(el, RM ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], 280); }
+  function fadeOut(el, done) { var a = anim(el, [{ opacity: 1 }, { opacity: 0 }], 150, { fill: "forwards" }); if (a) a.onfinish = done; else done(); }
+  function setPressed(sel, attr, val) { main.querySelectorAll(sel).forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset[attr] === val)); }); }
+  function detColor(hex) { return hex ? (lum(hex) < 0.5 ? "rgba(255,255,255,.5)" : "rgba(28,45,74,.32)") : "#C9D4DC"; }
+
+  function more(key, label) { return '<button type="button" class="more" data-info="' + key + '">' + ic("info") + (label || "Ver el detalle") + "</button>"; }
+  function intro(title, sub) { return '<div class="intro"><h1>' + title + "</h1>" + (sub ? '<p class="muted">' + sub + "</p>" : "") + "</div>"; }
+  function sec(n, t) { return '<div class="sec"><span class="num">' + n + "</span><h2>" + t + "</h2></div>"; }
+  function tagHtml(kind, label) { var v = VERD[kind]; return '<span class="str"></span><span class="tag ' + kind + '">' + ic(v[0]) + (label || v[1]) + "</span>"; }
+
+  /* ---------- Pantallas ---------- */
+  function v0() {
+    function card(k) {
+      var c = CAT[k];
+      return '<button type="button" class="cat ' + k + '" data-cat="' + k + '"><span class="hd"><span class="art">' + ic(c.icon) + '</span><span class="where">' + c.where + '</span></span><span class="ex">' + c.ex + '</span><span class="ft"><span><b>' + c.short + "</b>: " + c.min + ' prendas obligatorias</span><span class="go">Elegir' + ic("chev") + "</span></span></button>";
+    }
+    return '<section class="panel">' + intro("¿Dónde trabajas la mayor parte del tiempo?", "Toca la opción que más se parece a tu trabajo diario.") +
+      card("a") + card("b") +
+      '<button type="button" class="dunno" data-info="categoria">' + ic("help") + "No sé cuál es mi categoría</button>" +
+      '<p class="muted" style="text-align:center;font-size:15px">Puedes cambiarla después, en cualquier momento.</p></section>';
+  }
+  function v1() {
+    var c = CAT[state.cat];
+    function row(art, hex, name, dots, info) { return '<div class="mrow">' + garment(art, hex) + '<div class="txt"><span class="qty">1 unidad</span><span class="nm">' + name + '</span><span class="dots">' + dots + "</span>" + more(info) + "</div></div>"; }
+    var rows = row("parka", SW.azulmarino[1], "Parka impermeable térmica", dot("azulmarino") + '<span style="font-size:14px">Azul marino</span>', "parka") +
+      row("shoe", SW.cafe[1], "Zapato o zapatilla outdoor", dot("negro") + dot("cafe") + dot("gris") + dot("azulmarino") + '<span style="font-size:14px">Colores neutros</span>', "zapato") +
+      (state.cat === "b" ? row("pants", SW.azulmarino[1], "Pantalón outdoor", dot("azulmarino") + dot("azul") + dot("negro") + '<span style="font-size:14px">Azul o negro</span>', "pantalon") : "");
+    var saldo = c.saldo.map(function (s) { return '<div class="st">' + garment(s[0], null) + "<span>" + s[1] + "</span></div>"; }).join("");
+    return '<section class="panel">' + intro("Primero, compra estas " + c.min + " prendas", "Son obligatorias para tu categoría. Cómpralas antes que todo.") +
+      '<div class="must">' + rows + "</div>" +
+      sec("+", "Después, con lo que te quede") + '<p class="muted" style="margin-top:-10px">Puedes comprar cualquiera de estas, en colores institucionales.</p>' +
+      '<div class="saldo">' + saldo + "</div>" + more("saldo", "Ver las reglas del saldo") +
+      (state.cat === "b" ? '<div class="strip warn"><span class="bx">' + ic("helmet") + '</span><div><b>Nada con protección técnica</b><span>Eso es EPP y lo entrega gratis la Municipalidad.</span></div></div>' : "") +
+      '<div class="strip"><span class="bx">' + ic("coin") + '</span><div><b>Tu tarjeta: 6 UTM</b><span>Lo que no uses se pierde.</span>' + more("monto") + "</div></div></section>";
+  }
+  function parkaRes() {
+    if (!state.parka) return '<p class="muted">Toca una respuesta.</p>';
+    var k = state.parka === "si" ? "ok" : "warn";
+    return '<div class="res ' + k + '"><h3>' + (k === "ok" ? "Compra azul marino" : "Puedes comprar negra o café") + "</h3><p>" + (k === "ok" ? "Es el color que pide el Reglamento." : "Guarda una foto o el aviso del vendedor de que no había azul marino.") + "</p>" + (k === "warn" ? more("respaldo", "¿Por qué guardar un respaldo?") : "") + "</div>";
+  }
+  function v2() {
+    return '<section class="panel">' + intro("La parka en 2026", "Solo este año, la parka puede ser otra prenda de abrigo.") +
+      sec(1, "Sirve cualquiera de estas") +
+      '<div class="four">' +
+      '<div class="st">' + garment("parka", SW.azulmarino[1]) + "<span>Parka común</span></div>" +
+      '<div class="st">' + garment("jacket", SW.azulmarino[1]) + "<span>Chaqueta</span></div>" +
+      '<div class="st">' + garment("parka", SW.azulmarino[1]) + "<span>Chaqueta impermeable</span></div>" +
+      '<div class="st">' + garment("jacket", SW.azulmarino[1]) + "<span>Cortaviento</span></div></div>" +
+      sec(2, "El color, en este orden") +
+      '<div class="ladder">' +
+      '<div class="rung ok"><span class="pos">1°</span><span class="spools">' + spool(SW.azulmarino[1], 30) + '</span><div><b>Azul marino</b><br><span class="muted" style="font-size:15px">Siempre la primera opción</span></div></div>' +
+      '<div class="rung warn"><span class="pos">2°</span><span class="spools">' + spool(SW.negro[1], 30) + spool(SW.cafe[1], 30) + '</span><div><b>Negro o café</b><br><span class="muted" style="font-size:15px">Solo si no hay azul marino</span></div></div>' +
+      '<div class="rung bad"><span class="pos">' + ic("x") + '</span><div><b>Otros colores</b><br><span class="muted" style="font-size:15px">No sirven para esta prenda</span></div></div></div>' +
+      sec(3, "¿Encontraste azul marino?") +
+      '<div class="yesno"><button type="button" class="big" data-parka="si" aria-pressed="' + (state.parka === "si") + '">' + ic("check") + 'Sí, hay</button><button type="button" class="big" data-parka="no" aria-pressed="' + (state.parka === "no") + '">' + ic("x") + "No encontré</button></div>" +
+      '<div id="parka-res" aria-live="polite">' + parkaRes() + "</div>" + more("parka26", "Ver el detalle de la excepción") + "</section>";
+  }
+  function curG() { return GARMENTS.filter(function (x) { return x.id === state.garment; })[0]; }
+  function verdict() { return state.color ? curG().rule(state.color) : null; }
+  function tryInner(g, r) { return '<span class="what">' + g.name(state.cat) + " en " + SW[state.color][0].toLowerCase() + "</span><h3>" + VERD[r[0]][2] + "</h3><p>" + r[1] + '</p><p class="muted" style="font-size:15px">Regla: ' + g.detail + "</p>"; }
+  function v3() {
+    var g = curG(), hex = state.color ? SW[state.color][1] : null, r = verdict();
+    var gb = GARMENTS.map(function (x) { return '<button type="button" class="gb" data-garment="' + x.id + '" aria-pressed="' + (x.id === g.id) + '">' + silhouette(x.art) + "<span>" + x.name(state.cat) + "</span></button>"; }).join("");
+    var sp = COLORS.map(function (k) { return '<button type="button" class="sp" data-color="' + k + '" aria-pressed="' + (state.color === k) + '">' + spool(SW[k][1]) + "<span>" + SW[k][0] + "</span></button>"; }).join("");
+    var res = r ? '<div class="res ' + r[0] + '">' + tryInner(g, r) + "</div>" : '<div class="card muted">Elige un color en el paso 2 y aquí verás si sirve.</div>';
+    return '<section class="panel">' + intro("Probador de colores", "Revisa si una prenda y un color sirven, antes de comprar. Son 3 pasos.") +
+      sec(1, "¿Qué prenda vas a comprar?") + '<div class="gpick">' + gb + "</div>" +
+      sec(2, "¿De qué color es?") + '<div class="spoolgrid">' + sp + "</div>" +
+      sec(3, "Así queda") +
+      '<div class="stage"><span class="rail"></span><div class="hanger"><svg viewBox="0 0 60 30" width="60" height="30" aria-hidden="true"><path d="M30 2 q7 0 7 6 q0 5 -7 7 v6 M30 21 L4 29 h52 Z" fill="none" stroke="#1C2D4A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="gar">' + garment(g.art, hex) + "</span></div>" +
+      '<div class="hang" id="hang"' + (r ? ' data-kind="' + r[0] + '">' + tagHtml(r[0]) : " hidden>") + "</div>" +
+      '<span class="hint" id="hint"' + (r ? " hidden" : "") + ">Falta el color</span></div>" +
+      '<div id="try-res" aria-live="polite">' + res + "</div>" +
+      more("colores", "Ver cómo se usan los colores") + more("reglas", "Ver las reglas para todas las prendas") + "</section>";
+  }
+  /* El probador se actualiza en su lugar: así las transiciones (color, carrete, etiqueta) se pueden interrumpir sin saltos */
+  function updateTry(changed) {
+    var g = curG(), hex = state.color ? SW[state.color][1] : null, r = verdict(), kind = r ? r[0] : null;
+    setPressed(".gb", "garment", state.garment);
+    setPressed(".sp", "color", state.color);
+    var gar = $("gar");
+    if (changed === "garment") {
+      gar.innerHTML = garment(g.art, hex);
+      anim(gar.firstElementChild, RM ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: "translateY(6px) scale(.96)" }, { opacity: 1, transform: "none" }], 280);
+    } else {
+      gar.querySelectorAll(".dye").forEach(function (p) { p.setAttribute("fill", hex || "#FFFFFF"); });
+      gar.querySelectorAll(".det").forEach(function (p) { p.setAttribute("stroke", detColor(hex)); });
+    }
+    var hang = $("hang"), hint = $("hint");
+    if (!kind) { hang.hidden = true; hint.hidden = false; }
+    else if (hang.hidden || hang.dataset.kind !== kind) {
+      var first = hang.hidden;
+      hang.innerHTML = tagHtml(kind); hang.dataset.kind = kind; hang.hidden = false; hint.hidden = true;
+      hang.classList.remove("drop", "sway"); void hang.offsetWidth; hang.classList.add(first ? "drop" : "sway");
+    }
+    var box = $("try-res"), el = box.querySelector(".res");
+    if (!kind) return;
+    if (el) { el.className = "res " + kind; el.innerHTML = tryInner(g, r); morph(el); }
+    else { box.innerHTML = '<div class="res ' + kind + '">' + tryInner(g, r) + "</div>"; rise(box.firstElementChild); }
+  }
+  function v4() {
+    var items = [["interior", "underwear", "Ropa interior"], ["bano", "swim", "Traje de baño y ropa deportiva"], ["fiesta", "bowtie", "Ropa de fiesta"], ["bolso", "bag", "Carteras y mochilas"], ["perfume", "perfume", "Joyas y perfumes"], ["sandalia", "sandal", "Sandalias"], ["deportiva", "sneaker", "Zapatillas deportivas"], ["hogar", "plug", "Cosas del hogar"]];
+    var tiles = items.map(function (i) { return '<button type="button" class="nt" data-no="' + i[0] + '" aria-label="' + i[2] + ': no se compra con la tarjeta. Ver detalle">' + ic(i[1]) + '<span class="ban">' + ic("x") + "</span><span>" + i[2] + "</span></button>"; }).join("");
+    return '<section class="panel">' + intro("Lo que la tarjeta no paga", "Toca cada cosa para saber por qué.") +
+      '<div class="nogrid">' + tiles + "</div>" +
+      '<div class="strip ok"><span class="bx">' + ic("hanger") + '</span><div><b>Sí paga</b><span>Las prendas de tu lista, en colores institucionales y con boleta.</span></div></div>' +
+      '<div class="strip"><span class="bx">' + ic("helmet") + '</span><div><b>Botas de seguridad, cascos y chalecos reflectantes</b><span>Son EPP: los entrega gratis la Municipalidad. Pídelos a tu jefatura.</span>' + more("epp") + "</div></div>" +
+      '<div class="strip bad"><span class="bx">' + ic("cardX") + '</span><div><b>No la prestes ni la vendas</b><span>La tarjeta y las prendas son de la Municipalidad.</span>' + more("prohibido") + "</div></div></section>";
+  }
+  function v5() {
+    var steps = [["boleta", "Compra con boleta", "Que diga qué prenda compraste."], ["formulario", "Llena el formulario", "Anotas cada prenda, su color y su valor."], ["visacion", "Tu jefatura lo visa", "Revisa que todo sea de tu categoría."], ["control", "Control lo revisa", "Te dice si quedó bien o si hay que corregir."]];
+    var tl = steps.map(function (s, i) { return '<div class="tli"><span class="n">' + (i + 1) + '</span><div class="t"><b>' + s[1] + '</b><span class="muted">' + s[2] + "</span>" + more(s[0]) + "</div></div>"; }).join("");
+    return '<section class="panel">' + intro("Después de comprar: la rendición", "Son 4 pasos, en este orden.") +
+      '<div class="strip warn"><span class="bx">' + ic("calendar") + '</span><div><b>¿Hasta cuándo?</b><span>La fecha la fija la Dirección de Control: mínimo 60 días desde que recibes la tarjeta.</span>' + more("plazo") + "</div></div>" +
+      '<div class="tl">' + tl + "</div>" +
+      sec("?", "Si algo queda mal") +
+      '<div class="strip warn"><span class="bx">' + ic("clock") + '</span><div><b>Tienes 10 días hábiles para corregir</b><span>Si no corriges, devuelves el monto.</span>' + more("observaciones") + "</div></div>" +
+      '<div class="strip"><span class="bx">' + ic("lost") + '</span><div><b>¿Perdiste la tarjeta?</b><span>Avisa de inmediato a Recursos Humanos.</span>' + more("robo") + "</div></div></section>";
+  }
+  function checkItems() {
+    var c = state.cat;
+    return [
+      ["min", c === "a" ? "Compré la parka y el zapato o zapatilla" : "Compré la parka, el zapato o zapatilla y el pantalón outdoor"],
+      ["parka", "La parka es azul marino, o negra o café porque no había"],
+      ["sup", "La camisa o polera de todos los días es azul o celeste"],
+      ["logos", "Ninguna prenda tiene marcas o estampados grandes"],
+      ["zap", "Si es zapatilla: outdoor y sin logos deportivos llamativos"],
+      ["jeans", "Si son jeans: azul o negro liso, sin rasgaduras"],
+      ["excl", "No compré ropa interior, deportiva, de fiesta ni EPP"],
+      ["dist", "Tengo el pin o una prenda con el logo municipal"],
+      ["boleta", "Pedí boleta con el detalle de cada prenda"]
+    ];
+  }
+  function countDone() { var items = checkItems(); return [items.filter(function (i) { return state.checks[state.cat + i[0]]; }).length, items.length]; }
+  function doneHtml(animate) { return '<div class="done"><div class="hang' + (animate ? " drop" : "") + '">' + tagHtml("ok", "Listo") + '</div><div class="res ok" style="flex:1"><h3>Listo para pagar</h3><p>Guarda la boleta para la rendición.</p></div></div>'; }
+  function meterX(d, n) { return "translateX(" + (d / n * 100 - 100).toFixed(2) + "%)"; }
+  function v6() {
+    var items = checkItems(), c = countDone();
+    return '<section class="panel">' + intro("Antes de pagar en la caja", "Marca cada punto. Queda guardado en este teléfono.") +
+      '<div class="meter"><div class="trk"><div class="fill" id="mfill" style="transform:' + meterX(c[0], c[1]) + '"></div></div><b id="mcount" aria-live="polite">' + c[0] + " de " + c[1] + "</b></div>" +
+      '<div class="checks">' + items.map(function (i) {
+        var id = "ck-" + state.cat + "-" + i[0];
+        return '<label class="ck" for="' + id + '"><input type="checkbox" id="' + id + '" data-check="' + i[0] + '"' + (state.checks[state.cat + i[0]] ? " checked" : "") + '><span class="box">' + ic("check") + "</span><span>" + i[1] + "</span></label>";
+      }).join("") + "</div>" +
+      '<div id="donebox">' + (c[0] === c[1] ? doneHtml(false) : "") + "</div>" +
+      '<button type="button" class="textbtn" id="reset" style="align-self:flex-start">Desmarcar todo</button></section>';
+  }
+  function updateChecks(input) {
+    var c = countDone(), all = c[0] === c[1];
+    $("mfill").style.transform = meterX(c[0], c[1]);
+    $("mcount").textContent = c[0] + " de " + c[1];
+    var box = $("donebox"), cur = box.firstElementChild;
+    if (all && (!cur || cur.dataset.leaving)) { box.innerHTML = doneHtml(true); rise(box.querySelector(".res")); }
+    else if (!all && cur && !cur.dataset.leaving) { cur.dataset.leaving = "1"; fadeOut(cur, function () { if (box.firstElementChild === cur) box.innerHTML = ""; }); }
+    if (input && input.checked && !RM) anim(input.parentNode.querySelector(".box"), [{ transform: "scale(.82)" }, { transform: "scale(1.06)", offset: 0.6 }, { transform: "scale(1)" }], 300);
+  }
+  var VIEWS = [v0, v1, v2, v3, v4, v5, v6];
+
+  /* ---------- Render ---------- */
+  function renderSound() {
+    var b = $("sound");
+    b.setAttribute("aria-pressed", String(soundOn));
+    b.innerHTML = ic(soundOn ? "soundOn" : "soundOff") + (soundOn ? "Sonido" : "Sin sonido");
+  }
+  function renderChrome() {
+    var has = !!state.cat;
+    $("tape").hidden = !has;
+    $("catrow").hidden = !has;
+    $("nav").hidden = !has || state.step === 0;
+    $("stepname").textContent = has ? "Paso " + (state.step + 1) + " de 7: " + STEPS[state.step] : "Mi uniforme 2026";
+    if (!has) return;
+    var c = CAT[state.cat];
+    $("catrow").innerHTML = '<span class="kraft">' + c.short + " " + c.long + '</span><button type="button" class="textbtn" id="changecat">Cambiar categoría</button>';
+    var pct = (state.step + 0.5) / 7 * 100;
+    $("pintrack").style.transform = "translateX(" + pct.toFixed(2) + "%)";
+    $("tapedone").style.transform = "scaleX(" + (pct / 100).toFixed(4) + ")";
+    $("pinnum").textContent = state.step + 1;
+    $("tapenums").innerHTML = STEPS.map(function (s, i) {
+      return '<button type="button" data-step="' + i + '" aria-label="Ir al paso ' + (i + 1) + ": " + s + '"' + (i === state.step ? ' aria-current="step" style="color:transparent"' : "") + ">" + (i + 1) + "</button>";
+    }).join("");
+    $("nav").innerHTML = '<button type="button" class="btn" data-go="-1">' + ic("arrowL") + "Volver</button>" +
+      (state.step < 6 ? '<button type="button" class="btn primary" data-go="1">Siguiente: ' + STEPS[state.step + 1] + ic("arrowR") + "</button>" : '<button type="button" class="btn primary" data-step="0">' + ic("undo") + "Volver al inicio</button>");
+  }
+  function render(stepChanged) {
+    if (!state.cat) state.step = 0;
+    main.innerHTML = VIEWS[state.step]();
+    if (stepChanged && main.firstElementChild) main.firstElementChild.classList.add("enter");
+    renderChrome();
+    if (stepChanged) {
+      try { main.focus({ preventScroll: true }); } catch (e) {}
+      window.scrollTo(0, 0);
+    }
+  }
+  function go(i) {
+    var n = Math.max(0, Math.min(6, i));
+    if (n === state.step) return;
+    play(n > state.step ? "next" : "back");
+    state.step = n; render(true);
+  }
+
+  /* ---------- Hoja de detalle: se abre, se cierra y se puede arrastrar hacia abajo ---------- */
+  var sheet = $("sheet"), inner = $("sheet-in"), scrim = $("scrim"), hd = $("sheet-hd");
+  var lastFocus = null, sheetOpen = false, hideT = null;
+  function openInfo(k) {
+    var d = INFO[k]; if (!d) return;
+    lastFocus = document.activeElement;
+    $("sheet-t").textContent = d[0];
+    $("sheet-b").innerHTML = d[1];
+    $("sheet-s").textContent = "Fuente: " + d[2];
+    clearTimeout(hideT);
+    sheet.removeAttribute("data-closing");
+    inner.style.transform = ""; inner.style.transition = ""; scrim.style.opacity = ""; scrim.style.transition = "";
+    scrim.hidden = false; sheet.hidden = false; inner.scrollTop = 0;
+    void inner.offsetWidth;
+    sheet.setAttribute("data-open", ""); scrim.setAttribute("data-open", "");
+    sheetOpen = true; document.documentElement.style.overflow = "hidden";
+    try { $("sheet-x").focus({ preventScroll: true }); } catch (e) {}
+    play("open");
+  }
+  function closeInfo() {
+    if (!sheetOpen) return;
+    sheetOpen = false; play("close");
+    sheet.setAttribute("data-closing", "");
+    inner.style.transition = ""; inner.style.transform = ""; scrim.style.transition = ""; scrim.style.opacity = "";
+    sheet.removeAttribute("data-open"); scrim.removeAttribute("data-open");
+    document.documentElement.style.overflow = "";
+    hideT = setTimeout(function () {
+      sheet.hidden = true; scrim.hidden = true; sheet.removeAttribute("data-closing");
+      if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+    }, 260);
+  }
+  var sd = null;
+  hd.addEventListener("pointerdown", function (e) {
+    if (sd || !sheetOpen || !e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+    sd = { id: e.pointerId, y: e.clientY, t: performance.now(), dy: 0, h: inner.offsetHeight };
+    try { hd.setPointerCapture(e.pointerId); } catch (x) {}
+    inner.style.transition = "none"; scrim.style.transition = "none";
+  });
+  hd.addEventListener("pointermove", function (e) {
+    if (!sd || e.pointerId !== sd.id) return;
+    var dy = e.clientY - sd.y; sd.dy = dy;
+    /* Hacia arriba no hay tope duro: cuesta cada vez más (fricción) */
+    var y = dy >= 0 ? dy : -Math.pow(-dy, 0.6);
+    inner.style.transform = "translateY(" + y.toFixed(1) + "px)";
+    scrim.style.opacity = String(Math.max(0, 1 - Math.max(0, dy) / sd.h));
+  });
+  function endSheetDrag(e) {
+    if (!sd || e.pointerId !== sd.id) return;
+    var d = sd; sd = null;
+    var v = d.dy / Math.max(1, performance.now() - d.t);
+    inner.style.transition = ""; scrim.style.transition = "";
+    /* Basta un gesto rápido hacia abajo, aunque sea corto */
+    if (e.type !== "pointercancel" && (d.dy > d.h * 0.25 || (v > 0.11 && d.dy > 12))) closeInfo();
+    else { inner.style.transform = ""; scrim.style.opacity = ""; }
+  }
+  hd.addEventListener("pointerup", endSheetDrag);
+  hd.addEventListener("pointercancel", endSheetDrag);
+
+  /* ---------- Eventos ---------- */
+  document.addEventListener("touchstart", function () {}, { passive: true }); /* activa :active en iPhone */
+  document.addEventListener("click", function (ev) {
+    if (ev.target.id === "scrim") { closeInfo(); return; }
+    var t = ev.target.closest("button"); if (!t) return;
+    if (t.id === "sheet-x") { closeInfo(); return; }
+    if (t.id === "sound") { soundOn = !soundOn; store.set("mu26-sound", soundOn ? "on" : "off"); renderSound(); if (soundOn) play("on"); return; }
+    if (t.dataset.info) { openInfo(t.dataset.info); return; }
+    if (t.dataset.no) { var nk = t.dataset.no; play("bad"); setTimeout(function () { openInfo(nk); }, 140); return; }
+    if (t.dataset.cat) { state.cat = t.dataset.cat; store.set("mu26-cat", state.cat); state.color = null; state.parka = null; play("category"); state.step = 1; render(true); return; }
+    if (t.id === "changecat") { go(0); return; }
+    if (t.dataset.step) { go(Number(t.dataset.step)); return; }
+    if (t.dataset.go) { go(state.step + Number(t.dataset.go)); return; }
+    if (t.dataset.parka) {
+      if (state.parka === t.dataset.parka) return;
+      var had = !!state.parka; state.parka = t.dataset.parka;
+      setPressed(".big", "parka", state.parka);
+      play(state.parka === "si" ? "ok" : "warn");
+      var box = $("parka-res"); box.innerHTML = parkaRes();
+      if (had) morph(box.firstElementChild); else rise(box.firstElementChild);
+      return;
+    }
+    if (t.dataset.garment) {
+      if (state.garment === t.dataset.garment) return;
+      state.garment = t.dataset.garment;
+      var r1 = verdict(); play(r1 ? r1[0] : "tap");
+      updateTry("garment"); return;
+    }
+    if (t.dataset.color) {
+      if (state.color === t.dataset.color) return;
+      state.color = t.dataset.color;
+      play(verdict()[0]);
+      updateTry("color"); return;
+    }
+    if (t.id === "reset") {
+      checkItems().forEach(function (i) { delete state.checks[state.cat + i[0]]; });
+      store.set("mu26-checks", JSON.stringify(state.checks));
+      main.querySelectorAll("input[data-check]").forEach(function (x) { x.checked = false; });
+      play("back"); updateChecks(null);
+    }
+  });
+  document.addEventListener("change", function (ev) {
+    var t = ev.target; if (!t.dataset || !t.dataset.check) return;
+    state.checks[state.cat + t.dataset.check] = t.checked;
+    store.set("mu26-checks", JSON.stringify(state.checks));
+    var c = countDone();
+    if (t.checked && c[0] === c[1]) play("done"); else if (t.checked) play("tick", c[0]); else play("untick");
+    updateChecks(t);
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeInfo(); });
+
+  renderSound();
+  render(false);
+})();
+</script>
+
+<script>if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });</script>
+</body>
+</html>

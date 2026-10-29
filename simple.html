@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi uniforme en 7 pasos</title>
+<meta name="theme-color" content="#1D3A8A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi uniforme">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>.homebtn{width:40px;height:40px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;color:inherit;flex:none;text-decoration:none;-webkit-tap-highlight-color:transparent;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)}.homebtn:active{transform:scale(.94)}.hwrap{display:flex;align-items:center;gap:8px;min-width:0}</style>
+</head>
+<body>
+<style>
+/* Formato "historias": una tarjeta a pantalla completa por paso, como los estados de WhatsApp.
+   Cada tarjeta tiene su color. La tarjeta sigue el dedo al deslizar; basta un gesto rápido para pasar.
+   Una sola apariencia, a propósito: cada tarjeta fija su fondo y su texto. */
+:root {
+  color-scheme: light;
+  --navy: #1D3A8A;
+  --ink: #12224A;
+  --sun: #FFE08A;
+  --sky: #CFE3F7;
+  --mint: #D5EFE2;
+  --blush: #FBE0DE;
+  --white: #FFFFFF;
+  --ok: #17703F; --warn: #8A4E00; --bad: #A3241C;
+  --font: "Lexend", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --bg: var(--navy); --fg: #FFFFFF;
+}
+[hidden] { display: none !important; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 18px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased; transition: background-color 360ms ease, color 360ms ease;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0;
+  overflow: hidden;
+}
+.app { height: 100%; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; }
+button {
+  font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform 140ms var(--ease-out), background-color 200ms ease, box-shadow 200ms ease, color 200ms ease, border-color 200ms ease, opacity 200ms ease;
+}
+button:active { transform: scale(.97); }
+:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+svg { display: block; }
+.ico { width: 24px; height: 24px; flex: none; }
+h1 { font-weight: 800; font-size: clamp(2rem, 8.6vw, 2.6rem); line-height: 1.05; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+
+/* Barra de avance tipo historias */
+.top { padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.segs { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.segs span { height: 5px; border-radius: 5px; position: relative; overflow: hidden; }
+.segs span::before { content: ""; position: absolute; inset: 0; background: currentColor; opacity: .25; }
+.segs i { position: absolute; inset: 0; background: currentColor; border-radius: 5px; transform: scaleX(0); transform-origin: left center; transition: transform 320ms var(--ease-out); }
+.segs span.on i { transform: scaleX(1); }
+.toprow { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.sound { display: inline-flex; align-items: center; gap: 6px; height: 42px; border-radius: 999px; border: 1.5px solid currentColor; background: transparent; padding: 0 14px 0 10px; font-size: 15px; font-weight: 500; }
+.sound[aria-pressed="false"] { opacity: .7; }
+
+/* Tarjeta */
+.stage { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px 0 12px; scrollbar-width: none; touch-action: pan-y; }
+.stage::-webkit-scrollbar { display: none; }
+.card { min-height: 100%; display: flex; flex-direction: column; gap: 18px; }
+@keyframes cardIn { from { opacity: 0; transform: translateX(var(--from, 32px)); } }
+.card.in { animation: cardIn 300ms var(--ease-out) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px) scale(.95); } }
+.pop { animation: rise 360ms var(--ease-out) both; }
+.card.still .pop { animation: none; }
+.lead { font-size: 19px; opacity: .9; }
+.more { align-self: flex-start; border: 0; background: none; padding: 0; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.more:active { transform: scale(.98); }
+
+/* Piezas */
+.opt { width: 100%; text-align: left; border: 0; border-radius: 22px; padding: 18px; display: flex; align-items: center; gap: 16px; background: #FFFFFF; color: var(--ink); box-shadow: 0 6px 0 rgba(0,0,0,.2); transition: transform 120ms var(--ease-out), box-shadow 160ms var(--ease-out); }
+.opt:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+.opt .ic-wrap { width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center; flex: none; }
+.opt .ic-wrap .ico { width: 34px; height: 34px; }
+.opt b { display: block; font-size: 21px; line-height: 1.15; }
+.opt span.s { font-size: 15px; opacity: .75; }
+.opt[aria-pressed="true"] { box-shadow: 0 0 0 4px var(--sun), 0 6px 0 rgba(0,0,0,.2); }
+.opt[aria-pressed="true"]:active { box-shadow: 0 0 0 4px var(--sun), 0 2px 0 rgba(0,0,0,.2); }
+.row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.big-g { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-weight: 600; font-size: 16px; width: 140px; }
+.big-g .g { width: 120px; height: 120px; filter: drop-shadow(0 6px 6px rgba(18, 34, 74, .14)); }
+.badge { font-weight: 800; font-size: 15px; background: var(--ink); color: #fff; border-radius: 999px; padding: 2px 10px; font-variant-numeric: tabular-nums; }
+.pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 16px; background: rgba(255,255,255,.65); }
+.colorline { display: flex; flex-direction: column; gap: 10px; }
+.cl { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.7); border-radius: 18px; padding: 12px 14px; font-size: 17px; }
+.cl .sw { width: 44px; height: 44px; border-radius: 50%; flex: none; border: 2px solid rgba(0,0,0,.08); box-shadow: 0 0 0 3px rgba(255,255,255,.9); }
+.cl .mark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; }
+
+/* Probador */
+.try { display: flex; flex-direction: column; gap: 14px; }
+.tstage { position: relative; height: 200px; border-radius: 26px; background: #F1F4F9; display: grid; place-items: center; overflow: hidden; background-image: radial-gradient(90% 60% at 50% 100%, #E3E9F2 0, transparent 70%); }
+.tstage .g { width: 170px; height: 170px; filter: drop-shadow(0 8px 8px rgba(18, 34, 74, .14)); }
+.verdict { border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 17px; color: #fff; transition: background-color 240ms ease; }
+.verdict.ok { background: var(--ok); } .verdict.warn { background: var(--warn); } .verdict.bad { background: var(--bad); }
+.verdict b { font-size: 19px; }
+.gchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.gc { border: 2px solid #C9D3E3; background: #fff; border-radius: 999px; min-height: 44px; padding: 0 16px; font-weight: 600; font-size: 16px; color: var(--ink); }
+.gc[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.dots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px 6px; }
+.dt { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; color: var(--ink); padding: 0; }
+.dt:active { transform: none; }
+.dt .c { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(0,0,0,.1); transition: transform 220ms var(--ease-out), box-shadow 200ms ease; }
+.dt:active .c { transform: scale(.9); }
+.dt[aria-pressed="true"] { font-weight: 700; }
+.dt[aria-pressed="true"] .c { transform: scale(1.1); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ink); }
+.dye { transition: fill 320ms ease; }
+.det { transition: stroke 320ms ease; }
+
+/* No paga */
+.nog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ni { position: relative; border: 0; background: #fff; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; text-align: left; font-weight: 600; font-size: 16px; line-height: 1.15; color: var(--ink); min-height: 70px; box-shadow: 0 2px 0 rgba(163, 36, 28, .12); }
+.ni .ico { width: 32px; height: 32px; }
+.ni .ban { position: absolute; top: 8px; left: 34px; width: 20px; height: 20px; border-radius: 50%; background: var(--bad); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+.ni .ban .ico { width: 12px; height: 12px; }
+
+/* Rendición */
+.steps4 { display: flex; flex-direction: column; gap: 10px; }
+.s4 { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.75); border-radius: 18px; padding: 14px; }
+.s4 .n { width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none; }
+.s4 b { display: block; font-size: 18px; }
+.s4 span { font-size: 15px; opacity: .8; }
+
+/* Lista final: el visto se dibuja; desmarcar es más rápido que marcar */
+.ck { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); border-radius: 18px; padding: 14px; cursor: pointer; font-size: 17px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease; }
+.ck input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ck .box { width: 34px; height: 34px; border-radius: 10px; border: 2.5px solid rgba(255,255,255,.7); display: grid; place-items: center; color: #fff; flex: none; transition: transform 140ms var(--ease-out), background-color 200ms ease, border-color 200ms ease; }
+.ck:active .box { transform: scale(.9); }
+.ck .box .ico path { stroke-width: 2.6; stroke-dasharray: 21; stroke-dashoffset: 21; transition: stroke-dashoffset 120ms ease; }
+.ck:has(input:checked) { background: rgba(255,255,255,.95); color: var(--ink); border-color: #fff; }
+.ck:has(input:checked) .box { background: var(--ok); border-color: var(--ok); }
+.ck:has(input:checked) .box .ico path { stroke-dashoffset: 0; transition: stroke-dashoffset 240ms var(--ease-out) 40ms; }
+.ck:has(input:focus-visible) { outline: 3px solid var(--sun); outline-offset: 2px; }
+.party { border-radius: 22px; background: var(--sun); color: var(--ink); padding: 18px; display: flex; align-items: center; gap: 14px; }
+.party .ico { width: 40px; height: 40px; color: var(--ok); }
+.party b { font-size: 22px; display: block; }
+
+/* Navegación inferior */
+.nav { display: flex; gap: 10px; padding-block: 10px calc(14px + env(safe-area-inset-bottom, 0px)); }
+.nb { min-height: 60px; border-radius: 18px; border: 2px solid currentColor; background: transparent; padding: 0 18px; font-weight: 600; font-size: 18px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.nb.primary { flex: 1; border: 0; }
+.nb .ico { transition: transform 200ms var(--ease-out); }
+.dark .nb.primary { background: #FFFFFF; color: var(--navy); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.light .nb.primary { background: var(--ink); color: #FFFFFF; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.nb:disabled { opacity: .35; cursor: default; box-shadow: none; }
+.nb:disabled:active { transform: none; }
+
+/* Hoja de detalle: entra con curva de cajón; sale más rápido; se puede bajar con el dedo */
+.scrim { position: fixed; inset: 0; background: rgba(18, 34, 74, .5); z-index: 20; opacity: 0; transition: opacity 200ms ease; }
+.scrim[data-open] { opacity: 1; transition-duration: 300ms; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; display: flex; justify-content: center; pointer-events: none; }
+.sheet-in { pointer-events: auto; width: 100%; max-width: 560px; max-height: 82vh; overflow-y: auto; overscroll-behavior: contain; background: #FFFFFF; color: var(--ink); border-radius: 28px 28px 0 0; padding: 0 max(22px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 14px; font-size: 17px; box-shadow: 0 -12px 40px rgba(18, 34, 74, .25); transform: translateY(100%); transition: transform 420ms var(--ease-drawer); }
+.sheet[data-open] .sheet-in { transform: translateY(0); }
+.sheet[data-closing] .sheet-in { transition-duration: 240ms; }
+.sheet-hd { display: flex; flex-direction: column; gap: 12px; padding-top: 12px; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.sheet-hd:active { cursor: grabbing; }
+.sheet-in h2 { margin: 0; font-size: 24px; font-weight: 800; }
+.sheet-in ul { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.grab { width: 44px; height: 5px; border-radius: 5px; background: #D0D7E2; align-self: center; }
+.src { font-size: 14px; opacity: .7; border-top: 1px solid #E3E8EF; padding-top: 10px; }
+.sheet-in .nb { background: var(--ink); color: #fff; border: 0; }
+
+@media (hover: hover) and (pointer: fine) {
+  .gc:hover:not([aria-pressed="true"]) { border-color: var(--ink); }
+  .more:hover { opacity: .75; }
+  .nb:not(:disabled):not(.primary):hover { background: rgba(127, 127, 127, .12); }
+  .nb.primary:not(:disabled):hover .ico { transform: translateX(3px); }
+  .opt:hover:not([aria-pressed="true"]) { box-shadow: 0 0 0 3px rgba(255, 224, 138, .6), 0 6px 0 rgba(0,0,0,.2); }
+  .dt:hover:not([aria-pressed="true"]) .c { transform: scale(1.05); }
+  .ck:hover:not(:has(input:checked)) { border-color: rgba(255,255,255,.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes cardIn { from { opacity: 0; } }
+  @keyframes rise { from { opacity: 0; } }
+  button:active, .opt:active, .dt:active .c, .ck:active .box { transform: none; }
+  .dt[aria-pressed="true"] .c { transform: none; }
+  .segs i { transition: none; }
+  .sheet-in { transform: none; opacity: 0; transition: opacity 200ms ease; }
+  .sheet[data-open] .sheet-in { transform: none; opacity: 1; }
+}
+</style>
+
+<div class="app dark" id="app">
+  <div class="top">
+    <div class="segs" id="segs" aria-hidden="true"></div>
+    <div class="toprow"><span class="hwrap"><a class="homebtn" href="./" aria-label="Volver a la portada"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.75 10.5L12 4l8.25 6.5M5.75 9v10.25h4.5v-5.5h3.5v5.5h4.5V9"/></svg></a><span id="where">Mi uniforme 2026</span></span><button type="button" class="sound" id="sound" aria-pressed="true"></button></div>
+  </div>
+  <div class="stage" id="stage" aria-live="polite"></div>
+  <div class="nav">
+    <button type="button" class="nb" id="prev">Atrás</button>
+    <button type="button" class="nb primary" id="next">Siguiente</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t" hidden>
+  <div class="sheet-in" id="sheet-in">
+    <div class="sheet-hd" id="sheet-hd">
+      <div class="grab" aria-hidden="true"></div>
+      <h2 id="sh-t"></h2>
+    </div>
+    <div id="sh-b" style="display:flex;flex-direction:column;gap:10px"></div>
+    <p class="src" id="sh-s"></p>
+    <button type="button" class="nb" id="sh-x">Entendido</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var IC = {
+    info: "M12 2.75a9.25 9.25 0 1 0 0 18.5a9.25 9.25 0 1 0 0-18.5M12 11v5.5M12 7.75h.01",
+    soundOn: "M4.5 9.5h3l4.5-4v13l-4.5-4h-3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM15.5 9.2a4 4 0 0 1 0 5.6M18.2 6.6a7.8 7.8 0 0 1 0 10.8",
+    soundOff: "M4.5 9.5h3l4.5-4v13l-4.5-4h-3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1zM16 9.5l5 5M21 9.5l-5 5",
+    check: "M5 12.5l4.5 4.5L19 7.5",
+    x: "M6.5 6.5l11 11M17.5 6.5l-11 11",
+    alert: "M10.3 4.3L2.9 17.2a2 2 0 0 0 1.7 3h14.8a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0zM12 9.5v4.25M12 16.75h.01",
+    arrowR: "M5 12h14M13 6l6 6-6 6",
+    arrowL: "M19 12H5M11 6l-6 6 6 6",
+    building: "M3 9.5L12 4l9 5.5M5 9.5v9M19 9.5v9M9 11.75v5.5M12 11.75v5.5M15 11.75v5.5M3 19.75h18",
+    truck: "M2.75 16.25V7.5h10.75v8.75M13.5 10.25h4l3.25 3.4v2.6h-2.1M9.1 16.25h4.4M7 15.1a1.9 1.9 0 1 0 0 3.8a1.9 1.9 0 1 0 0-3.8M16.75 15.1a1.9 1.9 0 1 0 0 3.8a1.9 1.9 0 1 0 0-3.8",
+    help: "M12 2.75a9.25 9.25 0 1 0 0 18.5a9.25 9.25 0 1 0 0-18.5M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2-2.4 3.5M12 16.75h.01",
+    underwear: "M3.5 6.5h17v3.25c-3.9 1.5-6.1 4.7-6.6 8.75h-3.8c-.5-4.05-2.7-7.25-6.6-8.75z",
+    swim: "M8 3.5v4.25c2.4 1.9 5.6 1.9 8 0V3.5M8 7.75c-.9 4-.1 6.6 1.4 8.2l-.9 4.55h7l-.9-4.55c1.5-1.6 2.3-4.2 1.4-8.2",
+    bowtie: "M3.25 7.75l7 3.5-7 3.5zM20.75 7.75l-7 3.5 7 3.5zM10.25 9.75h3.5v3h-3.5z",
+    bag: "M5.25 8.25h13.5l-1.3 11.6a1.5 1.5 0 0 1-1.5 1.4H8.05a1.5 1.5 0 0 1-1.5-1.4zM9 8.25V7a3 3 0 0 1 6 0v1.25",
+    perfume: "M8 10h8a2 2 0 0 1 2 2v7.5a1.25 1.25 0 0 1-1.25 1.25H7.25A1.25 1.25 0 0 1 6 19.5V12a2 2 0 0 1 2-2zM10 10V7h4v3M9.25 4.25h5.5",
+    sandal: "M3.75 17.25c0-1.6 1.1-2.75 3.1-2.75h10.3c2 0 3.1 1.15 3.1 2.75v1.5H3.75zM8 14.5l2.5-6 3 6M15.75 14.5V9.75",
+    sneaker: "M3.25 17.5v-5.75l3.9-4.4 3 2.5 3.6 1.4h4.1c1.6 0 2.9 1.3 2.9 2.9v3.35zM3.25 17.5h17.5M8 13.6c3.1 1 6.1 1 9.1-.9",
+    plug: "M9 3.25v4M15 3.25v4M6.5 7.25h11v3.25a5.5 5.5 0 0 1-11 0zM12 16v4.75",
+    helmet: "M3.25 16.25h17.5v2.25H3.25zM5 16.25a7 7 0 0 1 14 0M10.5 9.6V7h3v2.6",
+    party: "M12 2.75a9.25 9.25 0 1 0 0 18.5a9.25 9.25 0 1 0 0-18.5M7.5 12.5l3 3 6-6.5"
+  };
+  function ic(n) { return '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + IC[n] + '"/></svg>'; }
+
+  function lum(hex) { var n = parseInt(hex.slice(1), 16); return (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; }
+  var BODY = {
+    jacket: "M40 22 L24 28 L12 48 L6 102 L21 104 L27 62 L29 114 L91 114 L93 62 L99 104 L114 102 L108 48 L96 28 L80 22 Q72 32 60 32 Q48 32 40 22 Z",
+    shirt: "M42 16 L26 22 L8 40 L20 56 L31 48 L31 108 L89 108 L89 48 L100 56 L112 40 L94 22 L78 16 Q72 28 60 28 Q48 28 42 16 Z",
+    pants: "M32 8 H88 L93 112 H66 L60 46 L54 112 H27 Z",
+    shoe: "M12 78 Q12 56 28 54 L50 50 Q60 48 66 58 Q76 70 94 72 Q112 74 112 88 L112 94 L12 94 Z"
+  };
+  var DET = {
+    parka: "M46 26 Q60 16 74 26 M60 33 V113 M35 84 H51 M69 84 H85 M8 94 L21 96 M99 96 L112 94 M29 104 H91",
+    jacket: "M40 22 L52 46 L60 34 L68 46 L80 22 M60 34 V113 M36 80 L50 76 M70 76 L84 80",
+    shirt: "M42 16 L52 32 L60 26 L68 32 L78 16 M60 30 V107 M70 48 H82 V58 H70 Z",
+    pants: "M32 18 H88 M60 18 V40 M37 18 Q41 30 49 30 M83 18 Q79 30 71 30 M44 44 L41 110 M76 44 L79 110",
+    jeans: "M32 18 H88 M60 18 V42 M36 18 Q40 32 50 32 M84 18 Q80 32 70 32 M64 22 H74 V28 M29 104 H54 M66 104 H92",
+    shoe: "M46 56 L54 66 M54 53 L61 62 M30 60 Q36 70 34 92 M70 74 Q90 82 110 82"
+  };
+  function garment(kind, hex) {
+    var fill = hex || "#FFFFFF", ol = 'stroke="#12224A" stroke-width="2.6" stroke-linejoin="round"';
+    var dk = hex ? (lum(hex) < 0.5 ? "rgba(255,255,255,.5)" : "rgba(18,34,74,.3)") : "#C9D4DC";
+    var k = kind === "parka" ? "jacket" : kind === "jeans" ? "pants" : kind;
+    var s = (kind === "parka" ? '<path class="dye" d="M42 24 Q40 4 60 4 Q80 4 78 24" fill="' + fill + '" ' + ol + '/>' : "") +
+      '<path class="dye" d="' + BODY[k] + '" fill="' + fill + '" ' + ol + '/>' +
+      (kind === "shoe" ? '<path d="M8 94 H116 V100 Q116 106 110 106 H14 Q8 106 8 100 Z" fill="#12224A" ' + ol + '/>' : "") +
+      '<path class="det" d="' + DET[kind] + '" fill="none" stroke="' + dk + '" stroke-width="2.2" stroke-linecap="round"/>';
+    return '<svg class="g" viewBox="0 0 120 120" aria-hidden="true">' + s + "</svg>";
+  }
+  var SW = { azulmarino: ["Azul marino", "#1F2B4A"], azul: ["Azul", "#2F5DA8"], celeste: ["Celeste", "#8FC4E8"], blanco: ["Blanco", "#FFFFFF"], negro: ["Negro", "#1B1B1B"], gris: ["Gris", "#9C9FA1"], cafe: ["Café", "#6B4A2B"], beige: ["Beige", "#D9C8A7"], amarillo: ["Amarillo", "#E3B33C"], verde: ["Verde", "#3E7B4E"] };
+  var COLORS = ["azulmarino", "azul", "celeste", "blanco", "negro", "gris", "cafe", "beige", "amarillo", "verde"];
+  function blue(c) { return c === "azulmarino" || c === "azul" || c === "celeste"; }
+  var GARMENTS = [
+    { id: "parka", art: "parka", name: "Parka", rule: function (c) {
+      if (c === "azulmarino") return ["ok", "Sí sirve. Es el color de la parka."];
+      if (c === "negro" || c === "cafe") return ["warn", "Solo si no encontraste azul marino."];
+      if (c === "azul" || c === "celeste") return ["warn", "Mejor azul marino. Pregunta antes."];
+      return ["bad", "No sirve para la parka."]; } },
+    { id: "camisa", art: "shirt", name: "Camisa o polera", rule: function (c) {
+      if (blue(c)) return ["ok", "Sí sirve. Debe ser de la familia azul."];
+      if (c === "blanco" || c === "negro") return ["warn", "Debe predominar el azul. Pregunta antes."];
+      return ["bad", "Este color solo va en detalles."]; } },
+    { id: "pantalon", art: "pants", name: "Pantalón", rule: function (c) {
+      if (blue(c) || c === "negro" || c === "blanco") return ["ok", "Sí sirve para el pantalón."];
+      if (c === "gris" || c === "cafe" || c === "beige") return ["warn", "Color secundario. Pregunta antes."];
+      return ["bad", "No sirve como color principal."]; } },
+    { id: "jeans", art: "jeans", name: "Jeans", rule: function (c) {
+      if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Sí, si es liso y sin rasgaduras."];
+      if (c === "celeste") return ["warn", "No debe ser deslavado. Pregunta antes."];
+      return ["bad", "Solo azul o negro liso."]; } },
+    { id: "zapato", art: "shoe", name: "Zapato o zapatilla", rule: function (c) {
+      if (c === "verde") return ["bad", "No sirve para el calzado."];
+      if (c === "amarillo") return ["warn", "Puede ser observado. Pregunta antes."];
+      return ["ok", "Sí sirve. Si es zapatilla, sin logos llamativos."]; } }
+  ];
+  var VERD = { ok: ["check", "Sirve"], warn: ["alert", "Consulta"], bad: ["x", "No sirve"] };
+
+  var INFO = {
+    categoria: ["¿Cómo sé mi categoría?", "<p>Cuenta lo que haces de verdad, no tu cargo.</p><ul><li><b>Categoría a)</b>: oficina, atención de público, profesionales y jefaturas que a veces salen a terreno.</li><li><b>Categoría b)</b>: conductores, maquinaria, mantención, aseo, áreas verdes y emergencia.</li></ul><p>La fija la Municipalidad en una nómina. Si tienes dudas, pregunta a tu jefatura o a Recursos Humanos.</p>", "Reglamento, artículos 6° y 7°."],
+    obligatorio: ["Las prendas obligatorias", "<ul><li><b>Parka impermeable térmica</b>, azul marino.</li><li><b>Zapato o zapatilla outdoor</b>, en color neutro y sin logos deportivos llamativos.</li><li><b>Pantalón outdoor</b>, solo categoría b).</li></ul><p>Después, con lo que quede, compras otras prendas de la lista: camisas, poleras, pantalones, sweaters, chalecos, polares y más, en colores institucionales.</p><p>La tarjeta es de 6 UTM. Lo que no uses se pierde.</p>", "Reglamento, artículos 6° y 9°."],
+    parka: ["La parka en 2026", "<p>Solo este año, la parka puede ser una parka común, una chaqueta, una chaqueta impermeable o un cortaviento.</p><p>Debe ser azul marino. Solo si no hay en azul marino, puede ser negra o café. Si compras negra o café, guarda una foto o el aviso del vendedor.</p><p>Desde 2027 vuelve la parka impermeable térmica azul marino.</p>", "Decreto Exento N° 3.080, de 22 de octubre de 2026."],
+    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> en lo que más se ve.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>Y en todas las prendas: sin marcas ni estampados grandes, y con el logo municipal o el pin.</p>", "Reglamento, artículos 4° y 5°."],
+    nopaga: ["Lo que no paga la tarjeta", "<p>Ropa interior, trajes de baño, ropa deportiva o de fiesta, carteras, mochilas, joyas, perfumes, sandalias, zapatillas deportivas o de moda, y cosas del hogar.</p><p><b>Los EPP</b> (botas de seguridad, cascos, chalecos reflectantes) los entrega gratis la Municipalidad: pídelos a tu jefatura.</p><p>No puedes prestar, vender ni cambiar por dinero la tarjeta.</p>", "Reglamento, artículos 8° y 15°; Reglamento de EPP."],
+    rendicion: ["La rendición", "<ul><li>Pide boleta con el detalle de cada prenda.</li><li>Llena el formulario de la Dirección de Control.</li><li>Tu jefatura lo revisa y firma.</li><li>Control lo certifica o te pide corregir.</li></ul><p>Si te piden corregir, tienes 10 días hábiles. Si no corriges, devuelves el monto.</p><p>La fecha para rendir la fija la Dirección de Control: mínimo 60 días desde que recibes la tarjeta.</p>", "Reglamento, artículos 18° a 23°."]
+  };
+
+  /* ---------- Sonido: suave y profundo ---------- */
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  var soundOn = store.get("mu7-sound") !== "off", AU = null;
+  function audio() {
+    if (!soundOn) return null;
+    try {
+      if (!AU) {
+        var C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+        var ctx = new C(), master = ctx.createGain(), warm = ctx.createBiquadFilter(), comp = ctx.createDynamicsCompressor();
+        master.gain.value = 1.4; warm.type = "lowpass"; warm.frequency.value = 4200; warm.Q.value = 0.3; comp.threshold.value = -22; comp.ratio.value = 3;
+        master.connect(warm); warm.connect(comp); comp.connect(ctx.destination);
+        var len = Math.floor(ctx.sampleRate * 2.4), imp = ctx.createBuffer(2, len, ctx.sampleRate);
+        for (var ch = 0; ch < 2; ch++) { var d = imp.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.4); }
+        var verb = ctx.createConvolver(), wet = ctx.createGain(), send = ctx.createGain();
+        verb.buffer = imp; wet.gain.value = 0.34; send.gain.value = 0.7;
+        send.connect(verb); verb.connect(wet); wet.connect(warm);
+        AU = { ctx: ctx, master: master, send: send };
+      }
+      if (AU.ctx.state === "suspended") AU.ctx.resume();
+      return AU;
+    } catch (e) { return null; }
+  }
+  /* Sonidos originales: piano cálido y celesta, en mi bemol mayor, con aire de vals nocturno.
+     Cada situación tiene su propia frase; nada se toma de canciones existentes. */
+  function n2f(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function piano(m, at, dur, vel, soft) {
+    var a = audio(); if (!a) return;
+    var ctx = a.ctx, t = ctx.currentTime + 0.02 + at, f = n2f(m);
+    var out = ctx.createGain(), lp = ctx.createBiquadFilter();
+    lp.type = "lowpass"; lp.Q.value = 0.5;
+    lp.frequency.setValueAtTime(Math.min(f * 7, 6000), t);
+    lp.frequency.exponentialRampToValueAtTime(Math.max(f * 1.6, 220), t + dur * 0.7);
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vel, t + (soft ? 0.018 : 0.007));
+    out.gain.exponentialRampToValueAtTime(vel * 0.38, t + 0.26);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    lp.connect(out); out.connect(a.master); out.connect(a.send);
+    [[1, 1], [2, 0.42], [3, 0.14], [4, 0.07], [5, 0.03]].forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain(), k = p[0];
+      o.type = "sine"; o.frequency.value = f * k * (1 + 0.00035 * k * k);
+      g.gain.setValueAtTime(p[1], t); g.gain.exponentialRampToValueAtTime(p[1] * 0.02, t + dur / Math.pow(k, 0.7));
+      o.connect(g); g.connect(lp); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  function celesta(m, at, dur, vel) {
+    var a = audio(); if (!a) return;
+    var ctx = a.ctx, t = ctx.currentTime + 0.02 + at, f = n2f(m);
+    var out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vel, t + 0.004);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    out.connect(a.master); out.connect(a.send);
+    [[1, 1], [3.98, 0.2], [8.9, 0.035]].forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain(), k = p[0];
+      o.type = "sine"; o.frequency.value = f * k;
+      g.gain.setValueAtTime(p[1], t); g.gain.exponentialRampToValueAtTime(p[1] * 0.01, t + dur / Math.pow(k, 0.8));
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  function pad(m, at, dur, vel) {
+    var a = audio(); if (!a) return;
+    var ctx = a.ctx, t = ctx.currentTime + 0.02 + at, f = n2f(m);
+    var out = ctx.createGain();
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(vel, t + 0.14);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    out.connect(a.master); out.connect(a.send);
+    [[1, 1, "sine"], [1.004, 0.5, "triangle"], [0.5, 0.35, "sine"]].forEach(function (p) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = p[2]; o.frequency.value = f * p[0]; g.gain.value = p[1];
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  function roll(ms, at, gap, dur, vel) { ms.forEach(function (m, i) { piano(m, at + i * gap, dur, vel, true); }); }
+  /* Cierre: tres compases de vals (bajo en el 1, acorde en el 2 y el 3) que terminan en mi bemol */
+  function waltz() {
+    var b = 0.3;
+    piano(44, 0, 1.2, 0.07, true); roll([60, 63, 67], b, 0.012, 0.5, 0.04); roll([60, 63, 67], 2 * b, 0.012, 0.5, 0.035);
+    piano(75, 0, 0.9, 0.08); piano(74, 2 * b, 0.55, 0.07);
+    piano(46, 3 * b, 1.2, 0.07, true); roll([56, 62, 65], 4 * b, 0.012, 0.5, 0.04); roll([56, 62, 65], 5 * b, 0.012, 0.5, 0.035);
+    piano(72, 3 * b, 0.55, 0.075); piano(74, 4 * b, 0.55, 0.075); piano(77, 5 * b, 0.55, 0.075);
+    piano(39, 6 * b, 3, 0.08, true); roll([55, 58, 62, 65], 6 * b + 0.02, 0.05, 2.8, 0.05); piano(79, 6 * b + 0.04, 2.6, 0.085);
+    celesta(82, 6 * b + 0.25, 2, 0.04); celesta(86, 6 * b + 0.38, 2, 0.035);
+    pad(39, 6 * b, 3.2, 0.05);
+  }
+  var TICK = [63, 65, 67, 70, 72, 75, 77, 79, 82]; /* cada punto marcado sube un peldaño */
+  function play(n, k) {
+    switch (n) {
+      case "tap": piano(58, 0, 0.7, 0.09, true); break;
+      case "next": piano(58, 0, 0.6, 0.08, true); piano(63, 0.085, 0.9, 0.09, true); break;
+      case "back": piano(63, 0, 0.6, 0.08, true); piano(58, 0.085, 0.9, 0.08, true); break;
+      case "category": roll([39, 46, 50, 55, 65], 0, 0.065, 2.4, 0.07); celesta(82, 0.38, 1.6, 0.05); pad(39, 0, 2.6, 0.05); break;
+      case "ok": piano(43, 0, 1.8, 0.06, true); roll([55, 58, 62], 0, 0.03, 1.6, 0.065); celesta(79, 0.12, 1.4, 0.05); celesta(82, 0.24, 1.6, 0.045); break;
+      case "warn": piano(41, 0, 1.8, 0.065, true); roll([51, 56, 58], 0.02, 0.03, 1.4, 0.06); piano(60, 0.3, 1.4, 0.07, true); break;
+      case "bad": piano(44, 0, 1.8, 0.07, true); roll([55, 60], 0.02, 0.04, 1.2, 0.055); piano(63, 0.04, 0.8, 0.07, true); piano(60, 0.3, 1.4, 0.07, true); break;
+      case "open": celesta(70, 0, 1.2, 0.05); celesta(77, 0.09, 1.4, 0.045); break;
+      case "close": piano(62, 0, 0.6, 0.06, true); break;
+      case "tick": var m = TICK[Math.max(0, Math.min(TICK.length - 1, (k || 1) - 1))]; piano(m, 0, 1.1, 0.085, true); celesta(m + 12, 0.01, 0.8, 0.025); break;
+      case "untick": piano(56, 0, 0.6, 0.06, true); break;
+      case "pop": piano(k || 63, 0, 0.9, 0.08, true); break;
+      case "done": waltz(); break;
+      case "on": piano(63, 0, 0.8, 0.08, true); piano(67, 0.1, 1, 0.08, true); celesta(82, 0.2, 1.2, 0.04); break;
+    }
+  }
+
+  /* ---------- Estado ---------- */
+  var CARDS = [
+    { bg: "#1D3A8A", dark: true, name: "Tu categoría" },
+    { bg: "#FFE08A", dark: false, name: "Lo obligatorio" },
+    { bg: "#CFE3F7", dark: false, name: "La parka 2026" },
+    { bg: "#FFFFFF", dark: false, name: "¿Sirve este color?" },
+    { bg: "#FBE0DE", dark: false, name: "Lo que no paga" },
+    { bg: "#D5EFE2", dark: false, name: "La rendición" },
+    { bg: "#1D3A8A", dark: true, name: "Antes de pagar" }
+  ];
+  var state = { i: 0, cat: store.get("mu7-cat"), g: "parka", c: "azulmarino", checks: {} };
+  if (state.cat !== "a" && state.cat !== "b") state.cat = null;
+  function $(id) { return document.getElementById(id); }
+  var stage = $("stage"), app = $("app"), segs = $("segs");
+  var RM = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+  function anim(el, frames, ms, opts) {
+    if (!el || !el.animate) return null;
+    try { var o = { duration: ms, easing: EASE_OUT }; if (opts) for (var k in opts) o[k] = opts[k]; return el.animate(frames, o); } catch (e) { return null; }
+  }
+  function morph(el) { anim(el, [{ opacity: 0.55, filter: "blur(2px)" }, { opacity: 1, filter: "blur(0px)" }], 220); }
+  function rise(el) { anim(el, RM ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: "translateY(8px) scale(.97)" }, { opacity: 1, transform: "none" }], 300); }
+  function detColor(hex) { return lum(hex) < 0.5 ? "rgba(255,255,255,.5)" : "rgba(18,34,74,.3)"; }
+  function more(k, label) { return '<button type="button" class="more" data-info="' + k + '">' + ic("info") + (label || "Ver más") + "</button>"; }
+  function curG() { return GARMENTS.filter(function (x) { return x.id === state.g; })[0]; }
+
+  /* Retrasos de entrada: explican el orden (primero esto, luego esto) */
+  var D1 = [120, 280, 440], D5 = [100, 230, 360, 490];
+  function c0() {
+    function opt(k, icon, t, s, bg, fg) { return '<button type="button" class="opt" data-cat="' + k + '" aria-pressed="' + (state.cat === k) + '"><span class="ic-wrap" style="background:' + bg + ";color:" + fg + '">' + ic(icon) + "</span><span><b>" + t + '</b><span class="s">' + s + "</span></span></button>"; }
+    return '<h1>¿Dónde trabajas la mayor parte del tiempo?</h1><p class="lead">Toca una opción para empezar.</p>' +
+      opt("a", "building", "En oficina, y a veces en terreno", "Categoría a)", "#DCE4F2", "#1D3A8A") +
+      opt("b", "truck", "En terreno, vehículos o caminos", "Categoría b)", "#FFF0C2", "#8A5A00") +
+      more("categoria", "No sé cuál es mi categoría");
+  }
+  function c1() {
+    var b = state.cat === "b";
+    var items = [["parka", SW.azulmarino[1], "Parka azul marino"], ["shoe", SW.cafe[1], "Zapato o zapatilla"]];
+    if (b) items.push(["pants", SW.azulmarino[1], "Pantalón outdoor"]);
+    var gs = items.map(function (x, i) { return '<div class="big-g pop" style="animation-delay:' + D1[i] + 'ms">' + garment(x[0], x[1]) + '<span class="badge">1</span><span>' + x[2] + "</span></div>"; }).join("");
+    return "<h1>Primero, compra " + (b ? "estas 3 prendas" : "estas 2 prendas") + "</h1><p class=\"lead\">Son obligatorias. Después, con lo que quede, compras lo que quieras de la lista.</p>" +
+      '<div class="row">' + gs + "</div>" +
+      '<span class="pill">Tu tarjeta: 6 UTM. Lo que no uses se pierde.</span>' + more("obligatorio");
+  }
+  function c2() {
+    return "<h1>La parka, solo este año</h1><p class=\"lead\">Puede ser parka, chaqueta o cortaviento. El color va en este orden:</p>" +
+      '<div class="colorline">' +
+      '<div class="cl pop" style="animation-delay:100ms"><span class="sw" style="background:#1F2B4A"></span><span style="flex:1"><b>Azul marino</b><br>Siempre primero</span><span class="mark" style="background:var(--ok)">' + ic("check") + "</span></div>" +
+      '<div class="cl pop" style="animation-delay:170ms"><span class="sw" style="background:#1B1B1B"></span><span class="sw" style="background:#6B4A2B;margin-left:-26px"></span><span style="flex:1"><b>Negro o café</b><br>Solo si no hay azul marino</span><span class="mark" style="background:var(--warn)">' + ic("alert") + "</span></div>" +
+      '<div class="cl pop" style="animation-delay:240ms"><span style="flex:1"><b>Otro color</b><br>No sirve</span><span class="mark" style="background:var(--bad)">' + ic("x") + "</span></div>" +
+      "</div>" + more("parka");
+  }
+  function verdictInner(r) { var v = VERD[r[0]]; return ic(v[0]) + "<span><b>" + v[1] + ".</b> " + r[1] + "</span>"; }
+  function c3() {
+    var g = curG(), r = g.rule(state.c);
+    var chips = GARMENTS.map(function (x) { return '<button type="button" class="gc" data-g="' + x.id + '" aria-pressed="' + (x.id === state.g) + '">' + x.name + "</button>"; }).join("");
+    var dots = COLORS.map(function (k) { return '<button type="button" class="dt" data-c="' + k + '" aria-pressed="' + (state.c === k) + '"><span class="c" style="background:' + SW[k][1] + '"></span>' + SW[k][0] + "</button>"; }).join("");
+    return "<h1>¿Sirve este color?</h1><p class=\"lead\">Elige la prenda y toca un color.</p>" +
+      '<div class="try"><div class="gchips">' + chips + "</div>" +
+      '<div class="tstage" id="tstage">' + garment(g.art, SW[state.c][1]) + '</div><div class="verdict ' + r[0] + '" id="verdict">' + verdictInner(r) + "</div>" +
+      '<div class="dots">' + dots + "</div></div>" + more("colores", "Ver las reglas de colores");
+  }
+  function updateTry(changed) {
+    var g = curG(), hex = SW[state.c][1], r = g.rule(state.c);
+    stage.querySelectorAll(".gc").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.g === state.g)); });
+    stage.querySelectorAll(".dt").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.c === state.c)); });
+    var ts = $("tstage");
+    if (changed === "g") {
+      ts.innerHTML = garment(g.art, hex);
+      anim(ts.firstElementChild, RM ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: "translateY(6px) scale(.96)" }, { opacity: 1, transform: "none" }], 280);
+    } else {
+      ts.querySelectorAll(".dye").forEach(function (p) { p.setAttribute("fill", hex); });
+      ts.querySelectorAll(".det").forEach(function (p) { p.setAttribute("stroke", detColor(hex)); });
+    }
+    var vd = $("verdict"); vd.className = "verdict " + r[0]; vd.innerHTML = verdictInner(r); morph(vd);
+    play(r[0]);
+  }
+  function c4() {
+    var items = [["underwear", "Ropa interior"], ["swim", "Traje de baño"], ["bowtie", "Ropa de fiesta"], ["bag", "Carteras y mochilas"], ["perfume", "Joyas y perfumes"], ["sandal", "Sandalias"], ["sneaker", "Zapatillas deportivas"], ["plug", "Cosas del hogar"]];
+    var tiles = items.map(function (x, i) { return '<div class="ni pop" style="animation-delay:' + (80 + i * 45) + 'ms">' + ic(x[0]) + '<span class="ban">' + ic("x") + "</span><span>" + x[1] + "</span></div>"; }).join("");
+    return "<h1>Con la tarjeta no se compra esto</h1>" + '<div class="nog">' + tiles + "</div>" +
+      '<span class="pill">' + ic("helmet") + "Botas de seguridad y cascos: los da gratis la Municipalidad.</span>" + more("nopaga");
+  }
+  function c5() {
+    var s = [["Compra con boleta", "Que diga qué prenda compraste"], ["Llena el formulario", "Lo entrega la Dirección de Control"], ["Tu jefatura lo firma", "Revisa que todo sea de tu categoría"], ["Control lo revisa", "Si hay que corregir, tienes 10 días hábiles"]];
+    return "<h1>Después de comprar, rinde</h1><p class=\"lead\">Son 4 pasos, en este orden.</p>" + '<div class="steps4">' +
+      s.map(function (x, i) { return '<div class="s4 pop" style="animation-delay:' + D5[i] + 'ms"><span class="n">' + (i + 1) + "</span><span><b>" + x[0] + "</b><span>" + x[1] + "</span></span></div>"; }).join("") + "</div>" + more("rendicion");
+  }
+  var CHECKS = [["obl", "Compré las prendas obligatorias"], ["azul", "Lo que más se ve es azul, celeste o azul marino"], ["marcas", "Sin marcas ni estampados grandes"], ["nada", "Nada deportivo, de fiesta ni EPP"], ["boleta", "Pedí boleta con el detalle"]];
+  function countChecks() { return CHECKS.filter(function (x) { return state.checks[x[0]]; }).length; }
+  var PARTY = '<div class="party">' + ic("party") + "<span><b>¡Listo para pagar!</b>Guarda la boleta para la rendición.</span></div>";
+  function c6() {
+    return "<h1>Antes de pagar en la caja</h1><p class=\"lead\">Marca cada punto.</p>" +
+      CHECKS.map(function (x) { return '<label class="ck" for="k-' + x[0] + '"><input type="checkbox" id="k-' + x[0] + '" data-k="' + x[0] + '"' + (state.checks[x[0]] ? " checked" : "") + '><span class="box">' + ic("check") + "</span><span>" + x[1] + "</span></label>"; }).join("") +
+      '<div id="partybox">' + (countChecks() === CHECKS.length ? PARTY : "") + "</div>";
+  }
+  var VIEWS = [c0, c1, c2, c3, c4, c5, c6];
+
+  /* ---------- Render ---------- */
+  segs.innerHTML = CARDS.map(function () { return "<span><i></i></span>"; }).join("");
+  function renderSound() { var b = $("sound"); b.setAttribute("aria-pressed", String(soundOn)); b.innerHTML = ic(soundOn ? "soundOn" : "soundOff") + (soundOn ? "Sonido" : "Sin sonido"); }
+  function renderChrome() {
+    var card = CARDS[state.i];
+    document.documentElement.style.setProperty("--bg", card.bg);
+    document.documentElement.style.setProperty("--fg", card.dark ? "#FFFFFF" : "#12224A");
+    app.className = "app " + (card.dark ? "dark" : "light");
+    Array.prototype.forEach.call(segs.children, function (s, i) { s.classList.toggle("on", i <= state.i); });
+    $("where").textContent = "Paso " + (state.i + 1) + " de 7: " + card.name;
+    var prev = $("prev"), next = $("next");
+    prev.disabled = state.i === 0;
+    prev.innerHTML = ic("arrowL") + "Atrás";
+    if (state.i === 0) { next.disabled = !state.cat; next.innerHTML = state.cat ? "Siguiente" + ic("arrowR") : "Elige una opción"; }
+    else if (state.i === 6) { next.disabled = false; next.innerHTML = "Volver al inicio"; }
+    else { next.disabled = false; next.innerHTML = "Siguiente" + ic("arrowR"); }
+  }
+  var timers = [];
+  /* from: desplazamiento de entrada en px (con signo); "still" = sin animación (teclado y carga inicial) */
+  function render(from) {
+    timers.forEach(clearTimeout); timers = [];
+    renderChrome();
+    var moving = typeof from === "number";
+    stage.innerHTML = '<div class="card' + (moving ? " in" : " still") + '"' + (moving ? ' style="--from:' + from + 'px"' : "") + ">" + VIEWS[state.i]() + "</div>";
+    stage.scrollTop = 0;
+    if (!moving) return;
+    if (state.i === 1) D1.slice(0, state.cat === "b" ? 3 : 2).forEach(function (d, i) { timers.push(setTimeout(function () { play("pop", [55, 58, 63][i]); }, d + 60)); });
+    if (state.i === 5) D5.forEach(function (d, i) { timers.push(setTimeout(function () { play("pop", [58, 63, 67, 70][i]); }, d + 60)); });
+  }
+  var leaving = false;
+  /* how: "btn" | "drag" | "key". Con teclado no se anima: se repite muchas veces y la animación lo haría sentir lento */
+  function go(n, how, dx) {
+    if (n < 0 || n > 6 || n === state.i || leaving) return;
+    if (n > 0 && !state.cat) return;
+    var fwd = n > state.i, sign = fwd ? 1 : -1;
+    play(fwd ? "next" : "back");
+    function swap() { leaving = false; state.i = n; render(how === "key" ? "still" : sign * (how === "drag" ? 56 : 32)); }
+    var card = stage.firstElementChild;
+    if (how === "key" || !card) { swap(); return; }
+    leaving = true;
+    var startX = how === "drag" ? (dx || 0) : 0;
+    var endX = RM ? startX : -sign * (how === "drag" ? Math.max(140, Math.abs(startX) + 90) : 24);
+    var a = anim(card, [{ opacity: card.style.opacity || 1, transform: "translateX(" + startX + "px)" }, { opacity: 0, transform: "translateX(" + endX + "px)" }], how === "drag" ? 170 : 120, { fill: "forwards" });
+    if (a) a.onfinish = swap; else swap();
+  }
+
+  /* ---------- Hoja de detalle ---------- */
+  var sheet = $("sheet"), inner = $("sheet-in"), scrim = $("scrim"), hd = $("sheet-hd");
+  var lastFocus = null, sheetOpen = false, hideT = null;
+  function openInfo(k) {
+    var d = INFO[k]; if (!d) return; lastFocus = document.activeElement;
+    $("sh-t").textContent = d[0]; $("sh-b").innerHTML = d[1]; $("sh-s").textContent = "Fuente: " + d[2];
+    clearTimeout(hideT); sheet.removeAttribute("data-closing");
+    inner.style.transform = ""; inner.style.transition = ""; scrim.style.opacity = ""; scrim.style.transition = "";
+    scrim.hidden = false; sheet.hidden = false; inner.scrollTop = 0;
+    void inner.offsetWidth;
+    sheet.setAttribute("data-open", ""); scrim.setAttribute("data-open", ""); sheetOpen = true;
+    try { $("sh-x").focus({ preventScroll: true }); } catch (e) {}
+    play("open");
+  }
+  function closeInfo() {
+    if (!sheetOpen) return; sheetOpen = false; play("close");
+    sheet.setAttribute("data-closing", "");
+    inner.style.transition = ""; inner.style.transform = ""; scrim.style.transition = ""; scrim.style.opacity = "";
+    sheet.removeAttribute("data-open"); scrim.removeAttribute("data-open");
+    hideT = setTimeout(function () {
+      sheet.hidden = true; scrim.hidden = true; sheet.removeAttribute("data-closing");
+      if (lastFocus && lastFocus.focus) { try { lastFocus.focus({ preventScroll: true }); } catch (e) {} }
+    }, 260);
+  }
+  var sd = null;
+  hd.addEventListener("pointerdown", function (e) {
+    if (sd || !sheetOpen || !e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+    sd = { id: e.pointerId, y: e.clientY, t: performance.now(), dy: 0, h: inner.offsetHeight };
+    try { hd.setPointerCapture(e.pointerId); } catch (x) {}
+    inner.style.transition = "none"; scrim.style.transition = "none";
+  });
+  hd.addEventListener("pointermove", function (e) {
+    if (!sd || e.pointerId !== sd.id) return;
+    var dy = e.clientY - sd.y; sd.dy = dy;
+    var y = dy >= 0 ? dy : -Math.pow(-dy, 0.6);
+    inner.style.transform = "translateY(" + y.toFixed(1) + "px)";
+    scrim.style.opacity = String(Math.max(0, 1 - Math.max(0, dy) / sd.h));
+  });
+  function endSheetDrag(e) {
+    if (!sd || e.pointerId !== sd.id) return;
+    var d = sd; sd = null;
+    var v = d.dy / Math.max(1, performance.now() - d.t);
+    inner.style.transition = ""; scrim.style.transition = "";
+    if (e.type !== "pointercancel" && (d.dy > d.h * 0.25 || (v > 0.11 && d.dy > 12))) closeInfo();
+    else { inner.style.transform = ""; scrim.style.opacity = ""; }
+  }
+  hd.addEventListener("pointerup", endSheetDrag);
+  hd.addEventListener("pointercancel", endSheetDrag);
+
+  /* ---------- Eventos ---------- */
+  var autoT = null;
+  document.addEventListener("touchstart", function () {}, { passive: true }); /* activa :active en iPhone */
+  document.addEventListener("click", function (ev) {
+    if (ev.target.id === "scrim") { closeInfo(); return; }
+    var t = ev.target.closest("button"); if (!t) return;
+    if (t.id === "sh-x") { closeInfo(); return; }
+    if (t.id === "sound") { soundOn = !soundOn; store.set("mu7-sound", soundOn ? "on" : "off"); renderSound(); if (soundOn) play("on"); return; }
+    if (t.id === "prev") { go(state.i - 1, "btn"); return; }
+    if (t.id === "next") { if (state.i === 6) go(0, "btn"); else go(state.i + 1, "btn"); return; }
+    if (t.dataset.info) { openInfo(t.dataset.info); return; }
+    if (t.dataset.cat) {
+      state.cat = t.dataset.cat; store.set("mu7-cat", state.cat); play("category");
+      stage.querySelectorAll(".opt").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.cat === state.cat)); });
+      renderChrome();
+      clearTimeout(autoT); autoT = setTimeout(function () { if (state.i === 0) go(1, "btn"); }, 520);
+      return;
+    }
+    if (t.dataset.g) { if (state.g === t.dataset.g) return; state.g = t.dataset.g; updateTry("g"); return; }
+    if (t.dataset.c) { if (state.c === t.dataset.c) return; state.c = t.dataset.c; updateTry("c"); return; }
+  });
+  document.addEventListener("change", function (ev) {
+    var t = ev.target; if (!t.dataset || !t.dataset.k) return;
+    state.checks[t.dataset.k] = t.checked;
+    var count = countChecks(), all = count === CHECKS.length;
+    if (t.checked && all) play("done"); else if (t.checked) play("tick", count); else play("untick");
+    if (t.checked && !RM) anim(t.parentNode.querySelector(".box"), [{ transform: "scale(.82)" }, { transform: "scale(1.06)", offset: 0.6 }, { transform: "scale(1)" }], 300);
+    var box = $("partybox"), cur = box.firstElementChild;
+    if (all && (!cur || cur.dataset.leaving)) { box.innerHTML = PARTY; rise(box.firstElementChild); }
+    else if (!all && cur && !cur.dataset.leaving) {
+      cur.dataset.leaving = "1";
+      var a = anim(cur, [{ opacity: 1 }, { opacity: 0 }], 150, { fill: "forwards" });
+      var clear = function () { if (box.firstElementChild === cur) box.innerHTML = ""; };
+      if (a) a.onfinish = clear; else clear();
+    }
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape") { closeInfo(); return; }
+    if (sheetOpen) return;
+    if (ev.target && /INPUT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight") go(state.i + 1, "key");
+    if (ev.key === "ArrowLeft") go(state.i - 1, "key");
+  });
+
+  /* ---------- Deslizar: la tarjeta sigue el dedo; un gesto rápido basta para pasar ---------- */
+  var drag = null, suppressClick = false;
+  function canGo(dx) { return dx < 0 ? (state.i < 6 && (state.i > 0 || !!state.cat)) : state.i > 0; }
+  stage.addEventListener("pointerdown", function (e) {
+    if (drag || leaving || !e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, on: false, w: stage.clientWidth };
+  });
+  stage.addEventListener("pointermove", function (e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.on) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+      if (Math.abs(dx) < 10 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      drag.on = true; drag.x += dx > 0 ? 10 : -10; drag.t = performance.now();
+      try { stage.setPointerCapture(e.pointerId); } catch (x) {}
+      drag.card = stage.firstElementChild; drag.card.classList.remove("in");
+      dx = e.clientX - drag.x;
+    }
+    var can = canGo(dx);
+    /* Si no hay tarjeta hacia ese lado, se mueve cada vez menos (amortiguado) */
+    var x = can ? dx : (dx < 0 ? -1 : 1) * Math.pow(Math.abs(dx), 0.62);
+    drag.dx = dx; drag.can = can; drag.x2 = x;
+    drag.card.style.transform = "translateX(" + x.toFixed(1) + "px)";
+    drag.card.style.opacity = can ? String(1 - Math.min(Math.abs(dx) / (drag.w * 1.6), 0.4)) : "";
+  });
+  function endDrag(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+    var d = drag; drag = null;
+    if (!d.on) return;
+    suppressClick = true; setTimeout(function () { suppressClick = false; }, 80);
+    var v = Math.abs(d.dx) / Math.max(1, performance.now() - d.t);
+    var commit = d.can && e.type !== "pointercancel" && (Math.abs(d.dx) > d.w * 0.22 || (v > 0.11 && Math.abs(d.dx) > 24));
+    if (commit) { go(state.i + (d.dx < 0 ? 1 : -1), "drag", d.x2); return; }
+    var card = d.card, op = card.style.opacity || "1", tr = card.style.transform || "translateX(0px)";
+    card.style.transform = ""; card.style.opacity = "";
+    anim(card, [{ transform: tr, opacity: op }, { transform: "translateX(0px)", opacity: 1 }], 320);
+  }
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+  /* Un arrastre no debe contar como toque (ni marcar una casilla por accidente) */
+  stage.addEventListener("click", function (e) { if (suppressClick) { e.preventDefault(); e.stopPropagation(); suppressClick = false; } }, true);
+
+  renderSound();
+  render("still");
+})();
+</script>
+
+<script>if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });</script>
+</body>
+</html>

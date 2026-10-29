@@ -1,0 +1,52 @@
+MI UNIFORME 2026 - ASEMUCH LAGO RANCO
+App instalable para teléfonos Android y iPhone (no requiere tienda de aplicaciones)
+
+QUÉ TRAE ESTA CARPETA
+- index.html ........ portada para elegir una de las tres versiones
+- compas.html ....... versión "A compás" (perchero y melodía)
+- completa.html ..... versión completa, con todo el detalle
+- simple.html ....... versión en 7 tarjetas
+- manifest.webmanifest, sw.js, icons/ y fonts/ ... lo que la hace instalable,
+  con su ícono, a pantalla completa y funcionando sin internet
+
+IMPORTANTE: la carpeta se sube completa, tal cual. No cambies nombres de archivos.
+
+
+PASO 1. PUBLICARLA EN INTERNET (una sola vez, gratis)
+
+Opción A, la más simple: Netlify
+ 1. Descomprime el .zip. Queda la carpeta "uniforme-asemuch".
+ 2. En el computador entra a https://app.netlify.com/drop
+ 3. Crea una cuenta gratis (puede ser con el correo de la Asociación).
+ 4. Arrastra la carpeta "uniforme-asemuch" al recuadro de la página.
+ 5. En segundos te da una dirección. Para dejarle un nombre claro:
+    Site configuration > Change site name > por ejemplo "uniforme-asemuch-lagoranco".
+    La dirección queda: https://uniforme-asemuch-lagoranco.netlify.app
+ Para actualizarla después (por ejemplo, cuando Control fije la fecha de rendición):
+    en el sitio, pestaña Deploys, arrastra de nuevo la carpeta con los cambios.
+
+Opción B: GitHub Pages (si prefieres tenerla en tu GitHub)
+ 1. Crea en GitHub un repositorio público vacío llamado "uniforme-asemuch".
+ 2. Sube el contenido de la carpeta (o pídele a Claude que lo suba).
+ 3. En el repositorio: Settings > Pages > Source: "Deploy from a branch",
+    Branch: "main" y carpeta "/ (root)" > Save.
+ 4. En un minuto queda en: https://TU-USUARIO.github.io/uniforme-asemuch/
+
+
+PASO 2. INSTALARLA EN EL TELÉFONO (cada socio)
+
+iPhone (en Safari):
+ 1. Abre el enlace.
+ 2. Toca el botón Compartir (cuadrado con flecha hacia arriba).
+ 3. Elige "Agregar a inicio" y luego "Agregar".
+
+Android (en Chrome):
+ 1. Abre el enlace.
+ 2. Toca "Instalar en este teléfono" en la portada, o el menú de los tres
+    puntos > "Instalar app" (o "Agregar a la pantalla principal").
+
+Desde ese momento aparece el ícono "Mi uniforme", se abre a pantalla completa
+(sin la barra del navegador) y funciona sin señal.
+
+Para escuchar los sonidos: subir el volumen y quitar el modo silencio
+(en iPhone, el interruptor del costado silencia los sonidos de la app).
