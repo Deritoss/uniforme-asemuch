@@ -53,7 +53,7 @@ body {
 }
 body::before { content: ""; position: fixed; top: 0; bottom: 0; left: max(8px, env(safe-area-inset-left, 0px)); width: 1.5px; background: var(--margin); opacity: .7; pointer-events: none; }
 .app {
-  height: 100vh; height: 100dvh; max-width: 560px; margin: 0 auto; display: grid;
+  height: 100vh; height: 100dvh; height: var(--app-h, 100dvh); max-width: 560px; margin: 0 auto; display: grid;
   grid-template-rows: auto minmax(150px, 1fr) var(--panelH) auto;
   --panelH: clamp(272px, 45dvh, 336px);
   padding: env(safe-area-inset-top, 0px) max(18px, env(safe-area-inset-right, 0px)) 0 max(20px, env(safe-area-inset-left, 0px));
@@ -136,6 +136,7 @@ svg { display: block; }
 .res.ok { border-color: var(--ok); background: var(--okBg); } .res.ok .ico { color: var(--ok); }
 .res.warn { border-color: var(--warn); background: var(--warnBg); } .res.warn .ico { color: var(--warn); }
 .res.bad { border-color: var(--bad); background: var(--badBg); } .res.bad .ico { color: var(--bad); }
+.res.hold { border-color: #9C3D10; background: #FBE0CF; } .res.hold .ico { color: #9C3D10; }
 .chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .chip { border: 2px solid var(--ink); background: #fff; border-radius: var(--sketch); min-height: 42px; padding: 0 4px; font-weight: 700; font-size: 15px; color: var(--ink2); }
 .chip:nth-child(2n) { border-radius: var(--sketch2); }
@@ -269,6 +270,10 @@ var rough=function(){"use strict";function t(t,e,s){if(t&&t.length){const[n,o]=e
 
 </script>
 <script>
+/* Alto real de la pantalla del teléfono (descuenta las barras del navegador), para que los botones siempre se vean */
+(function () { function fit() { document.documentElement.style.setProperty("--app-h", window.innerHeight + "px"); } fit(); window.addEventListener("resize", fit); window.addEventListener("orientationchange", function () { setTimeout(fit, 250); }); })();
+</script>
+<script>
 (function () {
   "use strict";
   function $(id) { return document.getElementById(id); }
@@ -309,29 +314,27 @@ var rough=function(){"use strict";function t(t,e,s){if(t&&t.length){const[n,o]=e
   var PROB = [
     { id: "camisa", layer: "shirt", name: "Camisa", rule: function (c) {
       if (blue(c)) return ["ok", "Sí sirve. La camisa o polera debe ser de la familia azul."];
-      if (c === "blanco" || c === "negro") return ["warn", "Debe predominar el azul. Pregunta antes de comprar."];
+      if (c === "blanco" || c === "negro") return ["hold", "El Reglamento pide que predomine el azul y no aclara si una prenda blanca o negra cumple. Hasta que Control lo aclare, elige azul."];
       return ["bad", "Este color solo va en detalles."]; } },
     { id: "pantalon", layer: "pants", name: "Pantalón", rule: function (c) {
       if (blue(c) || c === "negro" || c === "blanco") return ["ok", "Sí sirve para el pantalón."];
-      if (c === "gris" || c === "cafe" || c === "beige") return ["warn", "Es color secundario. Pregunta antes de comprar."];
+      if (c === "gris" || c === "cafe" || c === "beige") return ["bad", "El pantalón es prenda base: el gris, café y beige solo van en detalles o prendas secundarias."];
       return ["bad", "No sirve como color principal."]; } },
     { id: "jeans", layer: "pants", jeans: true, name: "Jeans", rule: function (c) {
       if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Sí, si es liso y sin rasgaduras."];
-      if (c === "celeste") return ["warn", "No debe ser deslavado. Pregunta antes de comprar."];
-      return ["bad", "Los jeans solo pueden ser azul o negro liso."]; } },
+            return ["bad", "Los jeans solo pueden ser azul o negro liso."]; } },
     { id: "zapato", layer: "shoes", name: "Calzado", rule: function (c) {
-      if (c === "verde") return ["bad", "No sirve para el calzado."];
-      if (c === "amarillo") return ["warn", "Puede ser observado. Pregunta antes de comprar."];
+      if (c === "verde" || c === "amarillo") return ["bad", "El calzado debe ser de color neutro. Este color solo va en detalles."];
       return ["ok", "Sí sirve. Si es zapatilla, outdoor y sin logos llamativos."]; } }
   ];
-  var VERD = { ok: ["check", "Sirve"], warn: ["alert", "Consulta"], bad: ["x", "No sirve"] };
-  var VCOL = { ok: ["#DFF1E5", "#237A47"], warn: ["#FBE9C2", "#9A5B00"], bad: ["#FADAD6", "#B3261E"] };
+  var VERD = { ok: ["check", "Sirve"], warn: ["alert", "Con condición"], hold: ["alert", "Mejor no"], bad: ["x", "No sirve"] };
+  var VCOL = { ok: ["#DFF1E5", "#237A47"], warn: ["#FBE9C2", "#9A5B00"], hold: ["#FBE0CF", "#9C3D10"], bad: ["#FADAD6", "#B3261E"] };
 
   var INFO = {
     categoria: ["¿Cómo sé mi categoría?", "<p>Cuenta lo que haces de verdad, no tu cargo.</p><ul><li><b>Categoría a)</b>: oficina, atención de público, profesionales y jefaturas que a veces salen a terreno.</li><li><b>Categoría b)</b>: conductores, maquinaria, mantención, aseo, áreas verdes y emergencia.</li></ul><p>La fija la Municipalidad en una nómina. Si tienes dudas, pregunta a tu jefatura o a Recursos Humanos.</p>", "Reglamento, artículos 6° y 7°."],
     obligatorio: ["Las prendas obligatorias", "<ul><li><b>Parka impermeable térmica</b>, azul marino.</li><li><b>Zapato o zapatilla outdoor</b>, en color neutro y sin logos deportivos llamativos.</li><li><b>Pantalón outdoor</b>, solo categoría b).</li></ul><p>Después, con lo que quede, compras otras prendas de la lista: camisas, poleras, pantalones, sweaters, chalecos, polares y más, en colores institucionales.</p><p>La tarjeta es de 6 UTM. Lo que no uses se pierde.</p>", "Reglamento, artículos 6° y 9°."],
     parka: ["La parka en 2026", "<p>Solo este año, la parka puede ser una parka común, una chaqueta, una chaqueta impermeable o un cortaviento.</p><p>Debe ser azul marino. Solo si no hay en azul marino, puede ser negra o café. Si compras negra o café, guarda una foto o el aviso del vendedor.</p><p>Desde 2027 vuelve la parka impermeable térmica azul marino.</p>", "Decreto Exento N° 3.080, de 22 de octubre de 2026."],
-    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> en lo que más se ve.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>Y en todas las prendas: sin marcas ni estampados grandes, y con el logo municipal o el pin.</p>", "Reglamento, artículos 4° y 5°."],
+    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> en lo que más se ve.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias, es decir, la segunda capa para el frío (sweater, chaleco, polar o cortaviento). No sirven como color principal de la chaqueta, la camisa o polera, el pantalón ni el calzado.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>Y en todas las prendas: sin marcas ni estampados grandes, y con el logo municipal o el pin.</p>", "Reglamento, artículos 4° y 5°."],
     nopaga: ["Lo que no paga la tarjeta", "<p>Ropa interior, trajes de baño, ropa deportiva o de fiesta, carteras, mochilas, joyas, perfumes, sandalias, zapatillas deportivas o de moda, y cosas del hogar.</p><p><b>Los EPP</b> (botas de seguridad, cascos, chalecos reflectantes) los entrega gratis la Municipalidad: pídelos a tu jefatura.</p><p>No puedes prestar, vender ni cambiar por dinero la tarjeta.</p>", "Reglamento, artículos 8° y 15°; Reglamento de EPP."],
     rendicion: ["La rendición", "<ul><li>Pide boleta con el detalle de cada prenda.</li><li>Llena el formulario de la Dirección de Control.</li><li>Tu jefatura lo revisa y firma.</li><li>Control lo certifica o te pide corregir.</li></ul><p>Si te piden corregir, tienes 10 días hábiles. Si no corriges, devuelves el monto.</p><p>La fecha para rendir la fija la Dirección de Control: mínimo 60 días desde que recibes la tarjeta.</p>", "Reglamento, artículos 18° a 23°."],
     lista: ["Antes de pagar", "<ul><li>Compraste las prendas obligatorias de tu categoría.</li><li>En lo que más se ve predomina la familia azul.</li><li>Ninguna prenda tiene marcas o estampados grandes.</li><li>Si es zapatilla: outdoor y sin logos deportivos llamativos. Si son jeans: azul o negro liso.</li><li>No compraste ropa interior, deportiva, de fiesta ni EPP.</li><li>Tienes el pin o una prenda con el logo municipal.</li><li>Pediste boleta con el detalle de cada prenda.</li></ul>", "Reglamento, artículos 4° a 8° y 19°."]
@@ -436,7 +439,7 @@ var rough=function(){"use strict";function t(t,e,s){if(t&&t.length){const[n,o]=e
   }
   function verdictSound(k, d) {
     if (k === "ok") { piano(43, d, 1.6, 0.055, true); roll([55, 58, 62], d, 0.03, 1.4, 0.06); celesta(79, d + 0.12, 1.2, 0.045); }
-    else if (k === "warn") { piano(41, d, 1.6, 0.06, true); roll([51, 56, 58], d + 0.02, 0.03, 1.2, 0.055); piano(60, d + 2 * EIGHTH, 1.2, 0.065, true); }
+    else if (k === "warn" || k === "hold") { piano(41, d, 1.6, 0.06, true); roll([51, 56, 58], d + 0.02, 0.03, 1.2, 0.055); piano(60, d + 2 * EIGHTH, 1.2, 0.065, true); }
     else { piano(44, d, 1.6, 0.065, true); roll([55, 60], d + 0.02, 0.04, 1.1, 0.05); piano(63, d + 0.04, 0.7, 0.065, true); piano(60, d + 2 * EIGHTH, 1.2, 0.065, true); }
   }
   function waltz(d) {
@@ -871,7 +874,7 @@ var rough=function(){"use strict";function t(t,e,s){if(t&&t.length){const[n,o]=e
       verdictSound(r[0], d3);
       at(d3, function () {
         var hex = SW[S.pc][1], had = !!S.fit[g.layer];
-        if (r[0] === "bad") S.preview = { layer: g.layer, color: hex, jeans: !!g.jeans };
+        if (r[0] === "bad" || r[0] === "hold") S.preview = { layer: g.layer, color: hex, jeans: !!g.jeans };
         else { S.preview = null; S.fit[g.layer] = hex; if (g.layer === "pants") S.fit.jeans = !!g.jeans; }
         paint(); if (had) wiggle(g.layer); showTag(r[0], g.layer);
         var vd = $("verdict"); if (vd) { vd.outerHTML = verdictHtml(); morph($("verdict")); }

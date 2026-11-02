@@ -35,6 +35,7 @@
   --okFg: #1E6B3F; --okBg: #DDF0E4;
   --warnFg: #7A4200; --warnBg: #F7E2B5;
   --badFg: #A3241C; --badBg: #F8D9D5;
+  --holdFg: #9C3D10; --holdBg: #FBE0CF;
   --cond: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -182,11 +183,12 @@ main:focus { outline: none; }
 .hang .str { width: 2px; height: 26px; background: var(--ink); }
 .tag { position: relative; padding: 18px 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; border: 2px solid currentColor; clip-path: polygon(50% 0, 100% 16px, 100% 100%, 0 100%, 0 16px); font-family: var(--cond); font-weight: 800; font-size: 21px; line-height: 1; }
 .tag::before { content: ""; position: absolute; top: 8px; left: 50%; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1.5px currentColor; }
-.tag.ok { background: var(--okBg); color: var(--okFg); } .tag.warn { background: var(--warnBg); color: var(--warnFg); } .tag.bad { background: var(--badBg); color: var(--badFg); }
+.tag.ok { background: var(--okBg); color: var(--okFg); } .tag.warn { background: var(--warnBg); color: var(--warnFg); } .tag.bad { background: var(--badBg); color: var(--badFg); } .tag.hold { background: var(--holdBg); color: var(--holdFg); }
 /* Resultado: con una costura punteada, como una etiqueta cosida */
 .res { display: flex; flex-direction: column; gap: 6px; border-radius: 14px; padding: 16px 18px; outline: 1.5px dashed rgba(28, 45, 74, .2); outline-offset: -7px; transition: background-color 240ms ease, outline-color 240ms ease; }
 .res.ok { background: var(--okBg); outline-color: rgba(30, 107, 63, .4); }
 .res.warn { background: var(--warnBg); outline-color: rgba(122, 66, 0, .35); }
+.res.hold { background: var(--holdBg); outline-color: rgba(156, 61, 16, .35); } .res.hold h3 { color: var(--holdFg); }
 .res.bad { background: var(--badBg); outline-color: rgba(163, 36, 28, .35); }
 .res .what { font-size: 15px; font-weight: 600; }
 .res h3 { font-size: 1.6rem; transition: color 240ms ease; }
@@ -430,34 +432,33 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
   var GARMENTS = [
     { id: "parka", art: "parka", name: function () { return "Parka obligatoria"; }, detail: "La parka es azul marino. Solo en 2026 puede ser negra o café si no encuentras azul marino (Decreto Exento N° 3.080).", rule: function (c) {
       if (c === "azulmarino") return ["ok", "Es el color que pide el Reglamento. Puedes comprarla."];
-      if (c === "negro" || c === "cafe") return ["warn", "Solo sirve en 2026 y solo si no encontraste azul marino. Guarda una foto o el aviso del vendedor."];
-      if (c === "azul" || c === "celeste") return ["warn", "El decreto pide azul marino. Otro tono de azul no está previsto: pregunta a tu jefatura antes de comprar."];
+      if (c === "negro" || c === "cafe") return ["warn", "Sirve solo en 2026 y solo si no encontraste azul marino. Guarda una foto o el aviso del vendedor."];
+      if (c === "azul" || c === "celeste") return ["bad", "El decreto pide azul marino y, solo si no hay, negra o café. Otro tono de azul no está previsto."];
       return ["bad", "La parka solo puede ser azul marino o, si no hay, negra o café."]; } },
-    { id: "exterior", art: "jacket", name: function () { return "Chaqueta o polar"; }, detail: "En la prenda exterior debe predominar la familia azul: celeste, azul o azul marino (artículo 5°).", rule: function (c) {
-      if (blue(c)) return ["ok", "La familia azul es la que corresponde a la prenda exterior."];
+    { id: "exterior", art: "jacket", name: function () { return "Chaqueta"; }, detail: "Es una prenda base: debe predominar la familia azul (celeste, azul o azul marino). Los colores secundarios solo van en detalles (artículo 5°).", rule: function (c) {
+      if (blue(c)) return ["ok", "La familia azul es la que corresponde a la chaqueta."];
+      if (c === "blanco" || c === "negro") return ["hold", "El Reglamento pide que predomine el azul y no aclara si una prenda blanca o negra cumple. Mientras la Dirección de Control no lo aclare, elige azul para no arriesgar la rendición."];
       if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
-      return ["warn", "En la prenda exterior debe predominar el azul. Pregunta a tu jefatura antes de comprar."]; } },
-    { id: "superior", art: "shirt", name: function (k) { return k === "a" ? "Camisa, blusa o polera" : "Camisa o polera"; }, detail: "La prenda de uso diario debe ser de la familia azul. El blanco y el negro sirven como contraste (artículo 5°).", rule: function (c) {
+      return ["bad", "La chaqueta es prenda base: el gris, café, beige y amarillo solo van en detalles o prendas secundarias."]; } },
+    { id: "superior", art: "shirt", name: function (k) { return k === "a" ? "Camisa, blusa o polera" : "Camisa o polera"; }, detail: "Es una prenda base, de uso diario: debe ser de la familia azul. El blanco y el negro sirven como contraste (artículo 5°).", rule: function (c) {
       if (blue(c)) return ["ok", "La prenda de todos los días debe ser de la familia azul."];
-      if (c === "blanco" || c === "negro") return ["warn", "Debe predominar el azul; el blanco y el negro sirven como contraste. Pregunta antes de comprar."];
+      if (c === "blanco" || c === "negro") return ["hold", "El Reglamento pide que predomine el azul y no aclara si una prenda blanca o negra cumple. Mientras la Dirección de Control no lo aclare, elige azul para no arriesgar la rendición."];
       return ["bad", "Este color solo sirve como detalle, no como color principal."]; } },
-    { id: "inferior", art: "pants", name: function (k) { return k === "a" ? "Pantalón, falda o vestido" : "Pantalón"; }, detail: "La prenda inferior puede ser de la familia azul o de un color básico como el negro o el blanco (artículo 5°, letra a).", rule: function (c) {
+    { id: "inferior", art: "pants", name: function (k) { return k === "a" ? "Pantalón, falda o vestido" : "Pantalón"; }, detail: "Es una prenda base: familia azul o un color básico como el negro o el blanco (artículo 5°, letra a).", rule: function (c) {
       if (blue(c) || c === "negro" || c === "blanco") return ["ok", "La familia azul o un color básico como el negro sirven aquí."];
-      if (c === "gris" || c === "cafe" || c === "beige") return ["warn", "Es un color secundario y no puede ser el principal. Pregunta a tu jefatura."];
+      if (c === "gris" || c === "cafe" || c === "beige") return ["bad", "El pantalón es prenda base: el gris, café y beige solo van en detalles o prendas secundarias."];
       return ["bad", "Este color no puede ser el principal de una prenda."]; } },
     { id: "jeans", art: "jeans", name: function () { return "Jeans"; }, detail: "Solo azul o negro liso, sin decoloración, rasgaduras, tachas, bordados ni desgaste (artículo 6°).", rule: function (c) {
       if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Sirve si es liso: sin rasgaduras, decoloración ni tachas."];
-      if (c === "celeste") return ["warn", "Un jeans celeste suele ser deslavado, y eso no se permite. Mejor azul o negro liso."];
       return ["bad", "Los jeans solo pueden ser azul o negro liso."]; } },
     { id: "calzado", art: "shoe", name: function () { return "Zapato o zapatilla"; }, detail: "Colores neutros o institucionales; si es zapatilla, outdoor y sin logos deportivos llamativos (artículo 5° y Decreto Exento N° 3.080).", rule: function (c) {
-      if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
-      if (c === "amarillo") return ["warn", "Un calzado entero amarillo puede ser observado. Pregunta antes de comprar."];
+      if (c === "verde" || c === "amarillo") return ["bad", "El calzado debe ser de color neutro. Este color solo va en detalles."];
       return ["ok", "Color neutro o institucional. Si es zapatilla, que sea outdoor y sin logos deportivos llamativos."]; } },
-    { id: "secundaria", art: "sweater", name: function (k) { return k === "a" ? "Sweater, chaleco o blazer" : "Sweater o chaleco"; }, detail: "Prenda secundaria: admite azul, blanco o negro, y también gris, café, beige o amarillo (artículo 5°).", rule: function (c) {
+    { id: "secundaria", art: "sweater", name: function () { return "Sweater, chaleco, polar o cortaviento"; }, detail: "Prenda secundaria (la segunda capa, para el frío): admite azul, blanco o negro, y también gris, café, beige o amarillo (artículo 5°).", rule: function (c) {
       if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
       return ["ok", "Sirve como prenda secundaria."]; } }
   ];
-  var VERD = { ok: ["check", "Sirve", "Sí, sirve"], warn: ["alert", "Consulta", "Pregunta antes de comprar"], bad: ["x", "No sirve", "No sirve para esta prenda"] };
+  var VERD = { ok: ["check", "Sirve", "Sí, sirve"], warn: ["alert", "Solo 2026", "Sí, con condición"], hold: ["alert", "Mejor no", "Mejor no, por ahora"], bad: ["x", "No sirve", "No sirve para esta prenda"] };
 
   /* ---------- Fichas de detalle ---------- */
   var INFO = {
@@ -469,7 +470,7 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
     monto: ["La tarjeta", "<ul><li>Monto: 6 UTM por funcionario, igual para las dos categorías.</li><li>Es personal y solo sirve para el uniforme.</li><li>No se cambia por dinero.</li><li>El saldo que no uses se pierde: no se acumula ni se devuelve.</li></ul>", "Reglamento, artículos 9° y 24°."],
     parka26: ["La excepción de 2026", "<p>Solo para la compra de 2026, la parka impermeable térmica se puede reemplazar por:</p><ul><li>una parka común (no necesita ser impermeable ni térmica),</li><li>una chaqueta,</li><li>una chaqueta impermeable, o</li><li>un cortaviento.</li></ul><p>Debe ser azul marino. Solo si no hay en azul marino, puede ser negra o café.</p><p>Debe llevar el logo municipal o el pin, igual que el resto del uniforme.</p>", "Decreto Exento N° 3.080, de 22 de octubre de 2026."],
     respaldo: ["Guarda un respaldo", "<p>Si compras negro o café, saca una foto de la tienda sin azul marino o guarda el aviso del vendedor.</p><p>El decreto no lo exige, pero te ayuda si te hacen observaciones en la rendición.</p>", "Recomendación de la Asociación."],
-    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> el color principal, sobre todo en la prenda de afuera y en la de todos los días.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>En terreno se pueden usar otros colores por seguridad, si la jefatura lo autoriza.</p>", "Reglamento, artículo 5°."],
+    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> el color principal, sobre todo en la prenda de afuera y en la de todos los días.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias, es decir, la segunda capa para el frío (sweater, chaleco, polar o cortaviento). No sirven como color principal de la chaqueta, la camisa o polera, el pantalón ni el calzado.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>En terreno se pueden usar otros colores por seguridad, si la jefatura lo autoriza.</p>", "Reglamento, artículo 5°."],
     reglas: ["En todas las prendas", "<ul><li>Sin marcas, logos ni estampados grandes que no sean de la Municipalidad.</li><li>Que no se parezcan al uniforme de Carabineros, Fuerzas Armadas, bomberos o seguridad.</li><li>Durante la jornada llevas el logo municipal en una prenda o el pin oficial.</li></ul>", "Reglamento, artículos 4° y 5°."],
     interior: ["Ropa interior", "<p>No se puede comprar con la tarjeta: no es parte del uniforme.</p>", "Reglamento, artículo 8° letra a)."],
     bano: ["Traje de baño y ropa deportiva", "<p>No se pueden comprar con la tarjeta.</p>", "Reglamento, artículo 8° letra b)."],
@@ -590,6 +591,7 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
       case "back": piano(63, 0, 0.6, 0.08, true); piano(58, 0.085, 0.9, 0.08, true); break;
       case "category": roll([39, 46, 50, 55, 65], 0, 0.065, 2.4, 0.07); celesta(82, 0.38, 1.6, 0.05); pad(39, 0, 2.6, 0.05); break;
       case "ok": piano(43, 0, 1.8, 0.06, true); roll([55, 58, 62], 0, 0.03, 1.6, 0.065); celesta(79, 0.12, 1.4, 0.05); celesta(82, 0.24, 1.6, 0.045); break;
+      case "hold":
       case "warn": piano(41, 0, 1.8, 0.065, true); roll([51, 56, 58], 0.02, 0.03, 1.4, 0.06); piano(60, 0.3, 1.4, 0.07, true); break;
       case "bad": piano(44, 0, 1.8, 0.07, true); roll([55, 60], 0.02, 0.04, 1.2, 0.055); piano(63, 0.04, 0.8, 0.07, true); piano(60, 0.3, 1.4, 0.07, true); break;
       case "open": celesta(70, 0, 1.2, 0.05); celesta(77, 0.09, 1.4, 0.045); break;
