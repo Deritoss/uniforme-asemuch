@@ -1,6 +1,6 @@
 /* Funciona sin internet: guarda la app la primera vez que se abre.
-   Para publicar cambios basta con subir los archivos nuevos: esta versión (f71a9d09) cambia sola. */
-var CACHE = "mi-uniforme-f71a9d09";
+   Para publicar cambios basta con subir los archivos nuevos: esta versión (bde0d734) cambia sola. */
+var CACHE = "mi-uniforme-bde0d734";
 var FILES = ["./", "./compas.html", "./completa.html", "./fonts/atkinson-hyperlegible-latin-400-normal.woff2", "./fonts/atkinson-hyperlegible-latin-700-normal.woff2", "./fonts/barlow-condensed-latin-600-normal.woff2", "./fonts/barlow-condensed-latin-700-normal.woff2", "./fonts/barlow-condensed-latin-800-normal.woff2", "./fonts/barlow-latin-400-normal.woff2", "./fonts/barlow-latin-500-normal.woff2", "./fonts/barlow-latin-600-normal.woff2", "./fonts/barlow-latin-700-normal.woff2", "./fonts/fonts.css", "./fonts/kalam-latin-400-normal.woff2", "./fonts/kalam-latin-700-normal.woff2", "./fonts/lexend-latin-400-normal.woff2", "./fonts/lexend-latin-500-normal.woff2", "./fonts/lexend-latin-600-normal.woff2", "./fonts/lexend-latin-800-normal.woff2", "./icons/apple-touch-icon.png", "./icons/favicon.png", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./index.html", "./manifest.webmanifest", "./simple.html"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));

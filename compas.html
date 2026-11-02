@@ -700,16 +700,28 @@ var rough=function(){"use strict";function t(t,e,s){if(t&&t.length){const[n,o]=e
   var VIEWS = [p0, p1, p2, p3, p4, p5, p6];
 
   /* El panel cambia hacia el lado en que avanzas, en el próximo tiempo */
+  /* El panel cambia hacia el lado en que avanzas. Si se toca rápido, la pantalla anterior se quita al instante:
+     nunca quedan dos pantallas encimadas. */
+  var lastSwap = 0;
+  function dropPanel(o) { if (o.getAnimations) o.getAnimations().forEach(function (x) { x.cancel(); }); o.remove(); }
   function swapPanel(dir, d) {
-    var old = panel.firstElementChild;
+    var olds = Array.prototype.slice.call(panel.children);
     var nv = document.createElement("section"); nv.className = "pv"; nv.innerHTML = VIEWS[S.i]();
     nv.querySelectorAll(".beat").forEach(function (c) { c.style.setProperty("--d", (d === null ? 0 : d).toFixed(3) + "s"); if (d === null) c.classList.remove("beat"); });
-    panel.appendChild(nv);
-    if (d === null || !old) { if (old) old.remove(); return; }
+    var now = performance.now(), quick = now - lastSwap < 450; lastSwap = now;
     var shift = RM ? 0 : 18 * dir;
+    if (d === null || !olds.length || quick || olds.length > 1) {
+      olds.forEach(dropPanel);
+      panel.appendChild(nv);
+      if (d !== null) anim(nv, [{ opacity: 0, transform: "translateX(" + (shift / 2) + "px)" }, { opacity: 1, transform: "none" }], 180);
+      return;
+    }
+    var old = olds[0];
+    old.style.pointerEvents = "none";
+    panel.appendChild(nv);
     var a = anim(old, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(" + (-shift) + "px)" }], 120, { fill: "forwards" });
-    if (a) a.onfinish = function () { old.remove(); }; else old.remove();
-    anim(nv, [{ opacity: 0, transform: "translateX(" + shift + "px)" }, { opacity: 1, transform: "none" }], 280, { delay: Math.max(60, d * 1000), fill: "backwards" });
+    if (a) a.onfinish = function () { if (old.parentNode) old.remove(); }; else old.remove();
+    anim(nv, [{ opacity: 0, transform: "translateX(" + shift + "px)" }, { opacity: 1, transform: "none" }], 260, { delay: Math.max(120, Math.min(180, d * 1000)), fill: "backwards" });
   }
   function renderSound() { var b = $("sound"); b.setAttribute("aria-pressed", String(soundOn)); b.innerHTML = ic(soundOn ? "soundOn" : "soundOff") + (soundOn ? "Sonido" : "Sin sonido"); }
   function renderChrome() {
