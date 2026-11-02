@@ -280,24 +280,26 @@ p { margin: 0; text-wrap: pretty; }
   function blue(c) { return c === "azulmarino" || c === "azul" || c === "celeste"; }
   var GARMENTS = [
     { id: "parka", art: "parka", name: "Parka", rule: function (c) {
-      if (c === "azulmarino") return ["ok", "Sí sirve. Es el color de la parka."];
+      if (c === "azulmarino") return ["ok", "Es el color de la parka."];
       if (c === "negro" || c === "cafe") return ["warn", "Solo en 2026 y solo si no encontraste azul marino."];
       if (c === "azul" || c === "celeste") return ["bad", "El decreto pide azul marino; si no hay, negra o café."];
       return ["bad", "No sirve para la parka."]; } },
-    { id: "camisa", art: "shirt", name: "Camisa o polera", rule: function (c) {
-      if (blue(c)) return ["ok", "Sí sirve. Debe ser de la familia azul."];
-      if (c === "blanco" || c === "negro") return ["hold", "El Reglamento no aclara si el blanco o negro cumple. Por ahora, elige azul."];
-      return ["bad", "Este color solo va en detalles."]; } },
+    { id: "camisa", art: "shirt", name: "Camisa o blusa", rule: function (c) {
+      if (blue(c) || c === "blanco" || c === "negro") return ["ok", "Familia azul, blanco o negro."];
+      return ["bad", "En la camisa este color solo va en detalles."]; } },
+    { id: "polera", art: "shirt", name: "Polera o beatle", rule: function (c) {
+      if (c === "verde") return ["bad", "El verde solo va en detalles pequeños."];
+      return ["ok", "Es prenda secundaria."]; } },
     { id: "pantalon", art: "pants", name: "Pantalón", rule: function (c) {
-      if (blue(c) || c === "negro" || c === "blanco") return ["ok", "Sí sirve para el pantalón."];
-      if (c === "gris" || c === "cafe" || c === "beige") return ["bad", "Gris, café y beige solo van en detalles o prendas secundarias."];
+      if (blue(c) || c === "negro" || c === "blanco") return ["ok", "La familia azul, el negro y el blanco sirven en el pantalón."];
+      if (c === "gris" || c === "cafe" || c === "beige") return ["ok", "Control acepta gris, café y beige."];
       return ["bad", "No sirve como color principal."]; } },
     { id: "jeans", art: "jeans", name: "Jeans", rule: function (c) {
-      if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Sí, si es liso y sin rasgaduras."];
+      if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Si es liso y sin rasgaduras."];
             return ["bad", "Solo azul o negro liso."]; } },
     { id: "zapato", art: "shoe", name: "Zapato o zapatilla", rule: function (c) {
-      if (c === "verde" || c === "amarillo") return ["bad", "El calzado debe ser de color neutro."];
-      return ["ok", "Sí sirve. Si es zapatilla, sin logos llamativos."]; } }
+      if (c === "verde" || c === "amarillo") return ["bad", "No sirve para el calzado."];
+      return ["ok", "Si es zapatilla, sin logos llamativos."]; } }
   ];
   var VERD = { ok: ["check", "Sirve"], warn: ["alert", "Con condición"], hold: ["alert", "Mejor no"], bad: ["x", "No sirve"] };
 
@@ -305,9 +307,9 @@ p { margin: 0; text-wrap: pretty; }
     categoria: ["¿Cómo sé mi categoría?", "<p>Cuenta lo que haces de verdad, no tu cargo.</p><ul><li><b>Categoría a)</b>: oficina, atención de público, profesionales y jefaturas que a veces salen a terreno.</li><li><b>Categoría b)</b>: conductores, maquinaria, mantención, aseo, áreas verdes y emergencia.</li></ul><p>La fija la Municipalidad en una nómina. Si tienes dudas, pregunta a tu jefatura o a Recursos Humanos.</p>", "Reglamento, artículos 6° y 7°."],
     obligatorio: ["Las prendas obligatorias", "<ul><li><b>Parka impermeable térmica</b>, azul marino.</li><li><b>Zapato o zapatilla outdoor</b>, en color neutro y sin logos deportivos llamativos.</li><li><b>Pantalón outdoor</b>, solo categoría b).</li></ul><p>Después, con lo que quede, compras otras prendas de la lista: camisas, poleras, pantalones, sweaters, chalecos, polares y más, en colores institucionales.</p><p>La tarjeta es de 6 UTM. Lo que no uses se pierde.</p>", "Reglamento, artículos 6° y 9°."],
     parka: ["La parka en 2026", "<p>Solo este año, la parka puede ser una parka común, una chaqueta, una chaqueta impermeable o un cortaviento.</p><p>Debe ser azul marino. Solo si no hay en azul marino, puede ser negra o café. Si compras negra o café, guarda una foto o el aviso del vendedor.</p><p>Desde 2027 vuelve la parka impermeable térmica azul marino.</p>", "Decreto Exento N° 3.080, de 22 de octubre de 2026."],
-    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> en lo que más se ve.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias, es decir, la segunda capa para el frío (sweater, chaleco, polar o cortaviento). No sirven como color principal de la chaqueta, la camisa o polera, el pantalón ni el calzado.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>Y en todas las prendas: sin marcas ni estampados grandes, y con el logo municipal o el pin.</p>", "Reglamento, artículos 4° y 5°."],
+    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> en lo que más se ve.</li><li><b>Blanco y negro:</b> libres. También sirven como color principal de la camisa, blusa, polera o chaqueta.</li><li><b>Gris, café y beige:</b> sirven en el pantalón, el calzado y las prendas secundarias.</li><li><b>Amarillo:</b> solo detalles o prendas secundarias.</li><li><b>Prendas secundarias:</b> sweater, chaleco, polar, cortaviento, polera piqué y beatle.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>Y en todas las prendas: sin marcas ni estampados grandes, y con el logo municipal o el pin.</p>", "Reglamento, artículos 4° y 5°; criterio de la Dirección de Control (2 de noviembre de 2026)."],
     nopaga: ["Lo que no paga la tarjeta", "<p>Ropa interior, trajes de baño, ropa deportiva o de fiesta, carteras, mochilas, joyas, perfumes, sandalias, zapatillas deportivas o de moda, y cosas del hogar.</p><p><b>Los EPP</b> (botas de seguridad, cascos, chalecos reflectantes) los entrega gratis la Municipalidad: pídelos a tu jefatura.</p><p>No puedes prestar, vender ni cambiar por dinero la tarjeta.</p>", "Reglamento, artículos 8° y 15°; Reglamento de EPP."],
-    rendicion: ["La rendición", "<ul><li>Pide boleta con el detalle de cada prenda.</li><li>Llena el formulario de la Dirección de Control.</li><li>Tu jefatura lo revisa y firma.</li><li>Control lo certifica o te pide corregir.</li></ul><p>Si te piden corregir, tienes 10 días hábiles. Si no corriges, devuelves el monto.</p><p>La fecha para rendir la fija la Dirección de Control: mínimo 60 días desde que recibes la tarjeta.</p>", "Reglamento, artículos 18° a 23°."]
+    rendicion: ["La rendición", "<ul><li>Pide boleta con el detalle de cada prenda.</li><li>Llena el formulario de la Dirección de Control.</li><li>Tu jefatura lo revisa y firma.</li><li>Control lo certifica o te pide corregir.</li></ul><p>Si te piden corregir, tienes 10 días hábiles. Si no corriges, devuelves el monto.</p><p>La fecha límite para rendir es el <b>30 de noviembre de 2026</b>.</p>", "Reglamento, artículos 18° a 23°; Dirección de Control."]
   };
 
   /* ---------- Sonido: suave y profundo ---------- */
@@ -502,7 +504,7 @@ p { margin: 0; text-wrap: pretty; }
   function c5() {
     var s = [["Compra con boleta", "Que diga qué prenda compraste"], ["Llena el formulario", "Lo entrega la Dirección de Control"], ["Tu jefatura lo firma", "Revisa que todo sea de tu categoría"], ["Control lo revisa", "Si hay que corregir, tienes 10 días hábiles"]];
     return "<h1>Después de comprar, rinde</h1><p class=\"lead\">Son 4 pasos, en este orden.</p>" + '<div class="steps4">' +
-      s.map(function (x, i) { return '<div class="s4 pop" style="animation-delay:' + D5[i] + 'ms"><span class="n">' + (i + 1) + "</span><span><b>" + x[0] + "</b><span>" + x[1] + "</span></span></div>"; }).join("") + "</div>" + more("rendicion");
+      s.map(function (x, i) { return '<div class="s4 pop" style="animation-delay:' + D5[i] + 'ms"><span class="n">' + (i + 1) + "</span><span><b>" + x[0] + "</b><span>" + x[1] + "</span></span></div>"; }).join("") + "</div>" + '<span class="pill">Plazo: hasta el 30 de noviembre de 2026.</span>' + more("rendicion");
   }
   var CHECKS = [["obl", "Compré las prendas obligatorias"], ["azul", "Lo que más se ve es azul, celeste o azul marino"], ["marcas", "Sin marcas ni estampados grandes"], ["nada", "Nada deportivo, de fiesta ni EPP"], ["boleta", "Pedí boleta con el detalle"]];
   function countChecks() { return CHECKS.filter(function (x) { return state.checks[x[0]]; }).length; }

@@ -435,26 +435,26 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
       if (c === "negro" || c === "cafe") return ["warn", "Sirve solo en 2026 y solo si no encontraste azul marino. Guarda una foto o el aviso del vendedor."];
       if (c === "azul" || c === "celeste") return ["bad", "El decreto pide azul marino y, solo si no hay, negra o café. Otro tono de azul no está previsto."];
       return ["bad", "La parka solo puede ser azul marino o, si no hay, negra o café."]; } },
-    { id: "exterior", art: "jacket", name: function () { return "Chaqueta"; }, detail: "Es una prenda base: debe predominar la familia azul (celeste, azul o azul marino). Los colores secundarios solo van en detalles (artículo 5°).", rule: function (c) {
+    { id: "exterior", art: "jacket", name: function () { return "Chaqueta"; }, detail: "Prenda base: familia azul, blanco o negro. Los colores secundarios solo van en detalles (artículo 5° y criterio de la Dirección de Control).", rule: function (c) {
       if (blue(c)) return ["ok", "La familia azul es la que corresponde a la chaqueta."];
-      if (c === "blanco" || c === "negro") return ["hold", "El Reglamento pide que predomine el azul y no aclara si una prenda blanca o negra cumple. Mientras la Dirección de Control no lo aclare, elige azul para no arriesgar la rendición."];
+      if (c === "blanco" || c === "negro") return ["ok", "Sirve: el blanco y el negro también pueden ser el color principal de la chaqueta."];
       if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
-      return ["bad", "La chaqueta es prenda base: el gris, café, beige y amarillo solo van en detalles o prendas secundarias."]; } },
-    { id: "superior", art: "shirt", name: function (k) { return k === "a" ? "Camisa, blusa o polera" : "Camisa o polera"; }, detail: "Es una prenda base, de uso diario: debe ser de la familia azul. El blanco y el negro sirven como contraste (artículo 5°).", rule: function (c) {
-      if (blue(c)) return ["ok", "La prenda de todos los días debe ser de la familia azul."];
-      if (c === "blanco" || c === "negro") return ["hold", "El Reglamento pide que predomine el azul y no aclara si una prenda blanca o negra cumple. Mientras la Dirección de Control no lo aclare, elige azul para no arriesgar la rendición."];
-      return ["bad", "Este color solo sirve como detalle, no como color principal."]; } },
-    { id: "inferior", art: "pants", name: function (k) { return k === "a" ? "Pantalón, falda o vestido" : "Pantalón"; }, detail: "Es una prenda base: familia azul o un color básico como el negro o el blanco (artículo 5°, letra a).", rule: function (c) {
+      return ["bad", "La chaqueta es prenda base: el gris, café, beige y amarillo solo van en detalles."]; } },
+    { id: "superior", art: "shirt", name: function (k) { return k === "a" ? "Camisa o blusa" : "Camisa"; }, detail: "Prenda base, de uso diario: familia azul, blanco o negro (artículo 5° y criterio de la Dirección de Control). La polera piqué y el beatle son prendas secundarias.", rule: function (c) {
+      if (blue(c)) return ["ok", "La familia azul es la recomendada para la prenda de todos los días."];
+      if (c === "blanco" || c === "negro") return ["ok", "Sirve: el blanco y el negro también pueden ser el color principal."];
+      return ["bad", "En la camisa o blusa este color solo va en detalles. Si es polera piqué o beatle, revísala como prenda secundaria."]; } },
+    { id: "inferior", art: "pants", name: function (k) { return k === "a" ? "Pantalón, falda o vestido" : "Pantalón"; }, detail: "Familia azul, negro, blanco, gris, café o beige (artículo 5° y criterio de la Dirección de Control).", rule: function (c) {
       if (blue(c) || c === "negro" || c === "blanco") return ["ok", "La familia azul o un color básico como el negro sirven aquí."];
-      if (c === "gris" || c === "cafe" || c === "beige") return ["bad", "El pantalón es prenda base: el gris, café y beige solo van en detalles o prendas secundarias."];
+      if (c === "gris" || c === "cafe" || c === "beige") return ["ok", "Sirve: la Dirección de Control acepta el gris, café y beige en el pantalón."];
       return ["bad", "Este color no puede ser el principal de una prenda."]; } },
     { id: "jeans", art: "jeans", name: function () { return "Jeans"; }, detail: "Solo azul o negro liso, sin decoloración, rasgaduras, tachas, bordados ni desgaste (artículo 6°).", rule: function (c) {
       if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Sirve si es liso: sin rasgaduras, decoloración ni tachas."];
       return ["bad", "Los jeans solo pueden ser azul o negro liso."]; } },
-    { id: "calzado", art: "shoe", name: function () { return "Zapato o zapatilla"; }, detail: "Colores neutros o institucionales; si es zapatilla, outdoor y sin logos deportivos llamativos (artículo 5° y Decreto Exento N° 3.080).", rule: function (c) {
-      if (c === "verde" || c === "amarillo") return ["bad", "El calzado debe ser de color neutro. Este color solo va en detalles."];
+    { id: "calzado", art: "shoe", name: function () { return "Zapato o zapatilla"; }, detail: "Colores neutros o institucionales: negro, azul, blanco, gris, café o beige. Si es zapatilla, outdoor y sin logos deportivos llamativos (artículo 5°, Decreto Exento N° 3.080 y criterio de la Dirección de Control).", rule: function (c) {
+      if (c === "verde" || c === "amarillo") return ["bad", "El calzado no puede ser de este color: solo va en detalles."];
       return ["ok", "Color neutro o institucional. Si es zapatilla, que sea outdoor y sin logos deportivos llamativos."]; } },
-    { id: "secundaria", art: "sweater", name: function () { return "Sweater, chaleco, polar o cortaviento"; }, detail: "Prenda secundaria (la segunda capa, para el frío): admite azul, blanco o negro, y también gris, café, beige o amarillo (artículo 5°).", rule: function (c) {
+    { id: "secundaria", art: "sweater", name: function () { return "Sweater, chaleco, polar, polera piqué o beatle"; }, detail: "Prenda secundaria: admite azul, blanco o negro, y también gris, café, beige o amarillo (artículo 5° y criterio de la Dirección de Control).", rule: function (c) {
       if (c === "verde") return ["bad", "El verde solo se permite como detalle pequeño."];
       return ["ok", "Sirve como prenda secundaria."]; } }
   ];
@@ -470,7 +470,7 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
     monto: ["La tarjeta", "<ul><li>Monto: 6 UTM por funcionario, igual para las dos categorías.</li><li>Es personal y solo sirve para el uniforme.</li><li>No se cambia por dinero.</li><li>El saldo que no uses se pierde: no se acumula ni se devuelve.</li></ul>", "Reglamento, artículos 9° y 24°."],
     parka26: ["La excepción de 2026", "<p>Solo para la compra de 2026, la parka impermeable térmica se puede reemplazar por:</p><ul><li>una parka común (no necesita ser impermeable ni térmica),</li><li>una chaqueta,</li><li>una chaqueta impermeable, o</li><li>un cortaviento.</li></ul><p>Debe ser azul marino. Solo si no hay en azul marino, puede ser negra o café.</p><p>Debe llevar el logo municipal o el pin, igual que el resto del uniforme.</p>", "Decreto Exento N° 3.080, de 22 de octubre de 2026."],
     respaldo: ["Guarda un respaldo", "<p>Si compras negro o café, saca una foto de la tienda sin azul marino o guarda el aviso del vendedor.</p><p>El decreto no lo exige, pero te ayuda si te hacen observaciones en la rendición.</p>", "Recomendación de la Asociación."],
-    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> el color principal, sobre todo en la prenda de afuera y en la de todos los días.</li><li><b>Blanco y negro:</b> libres, como base o contraste.</li><li><b>Gris, café, beige y amarillo:</b> solo detalles o prendas secundarias, es decir, la segunda capa para el frío (sweater, chaleco, polar o cortaviento). No sirven como color principal de la chaqueta, la camisa o polera, el pantalón ni el calzado.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>En terreno se pueden usar otros colores por seguridad, si la jefatura lo autoriza.</p>", "Reglamento, artículo 5°."],
+    colores: ["Cómo se usan los colores", "<ul><li><b>Celeste, azul y azul marino:</b> el color principal, sobre todo en la prenda de afuera y en la de todos los días.</li><li><b>Blanco y negro:</b> libres. También sirven como color principal de la camisa, blusa, polera o chaqueta.</li><li><b>Gris, café y beige:</b> sirven en el pantalón, el calzado y las prendas secundarias.</li><li><b>Amarillo:</b> solo detalles o prendas secundarias.</li><li><b>Prendas secundarias:</b> sweater, chaleco, polar, cortaviento, polera piqué y beatle.</li><li><b>Verde:</b> solo un detalle pequeño.</li></ul><p>En terreno se pueden usar otros colores por seguridad, si la jefatura lo autoriza.</p>", "Reglamento, artículo 5°; criterio de la Dirección de Control (2 de noviembre de 2026)."],
     reglas: ["En todas las prendas", "<ul><li>Sin marcas, logos ni estampados grandes que no sean de la Municipalidad.</li><li>Que no se parezcan al uniforme de Carabineros, Fuerzas Armadas, bomberos o seguridad.</li><li>Durante la jornada llevas el logo municipal en una prenda o el pin oficial.</li></ul>", "Reglamento, artículos 4° y 5°."],
     interior: ["Ropa interior", "<p>No se puede comprar con la tarjeta: no es parte del uniforme.</p>", "Reglamento, artículo 8° letra a)."],
     bano: ["Traje de baño y ropa deportiva", "<p>No se pueden comprar con la tarjeta.</p>", "Reglamento, artículo 8° letra b)."],
@@ -486,7 +486,7 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
     formulario: ["El formulario", "<p>Lo entrega la Dirección de Control. Anotas cada prenda con su color, cantidad y valor, y firmas que corresponden a tu categoría.</p>", "Reglamento, artículo 19°."],
     visacion: ["Tu jefatura lo visa", "<p>Tu jefatura revisa que las prendas sean de tu categoría, tengan los colores correctos y que tengas logo o pin. Si algo no calza, te pide corregirlo.</p>", "Reglamento, artículo 20°."],
     control: ["Control lo revisa", "<p>La Dirección de Control compara el formulario con la boleta y certifica la rendición o te hace observaciones.</p>", "Reglamento, artículo 21°."],
-    plazo: ["Plazo para rendir en 2026", "<p>La Dirección de Control fijará la fecha por escrito. No puede ser menos de 60 días desde que recibes la tarjeta.</p><p>La Asociación avisará apenas se informe.</p>", "Reglamento, artículo 18°."],
+    plazo: ["Plazo para rendir en 2026", "<p>Tienes plazo hasta el <b>30 de noviembre de 2026</b> para entregar la rendición a la Dirección de Control.</p><p>No lo dejes para el último día: si falta algo, tu jefatura y Control necesitan tiempo para revisarlo.</p>", "Dirección de Control, informado el 2 de noviembre de 2026; Reglamento, artículo 18°."],
     observaciones: ["Si te hacen observaciones", "<p>Tienes 10 días hábiles para corregir o aclarar.</p><p>Si no corriges, o no rindes a tiempo, debes devolver el monto en Tesorería en 10 días hábiles. Si no lo haces, te pueden pedir autorización para descontarlo del sueldo (hasta un 15%), y puede haber sumario.</p>", "Reglamento, artículos 22° y 23°."],
     robo: ["Si pierdes la tarjeta", "<p>Avisa de inmediato a Recursos Humanos para bloquearla. Lo comprado antes de tu aviso no lo cubre la Municipalidad.</p>", "Reglamento, artículo 25°."]
   };
@@ -731,7 +731,7 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
     var steps = [["boleta", "Compra con boleta", "Que diga qué prenda compraste."], ["formulario", "Llena el formulario", "Anotas cada prenda, su color y su valor."], ["visacion", "Tu jefatura lo visa", "Revisa que todo sea de tu categoría."], ["control", "Control lo revisa", "Te dice si quedó bien o si hay que corregir."]];
     var tl = steps.map(function (s, i) { return '<div class="tli"><span class="n">' + (i + 1) + '</span><div class="t"><b>' + s[1] + '</b><span class="muted">' + s[2] + "</span>" + more(s[0]) + "</div></div>"; }).join("");
     return '<section class="panel">' + intro("Después de comprar: la rendición", "Son 4 pasos, en este orden.") +
-      '<div class="strip warn"><span class="bx">' + ic("calendar") + '</span><div><b>¿Hasta cuándo?</b><span>La fecha la fija la Dirección de Control: mínimo 60 días desde que recibes la tarjeta.</span>' + more("plazo") + "</div></div>" +
+      '<div class="strip warn"><span class="bx">' + ic("calendar") + '</span><div><b>Plazo: hasta el 30 de noviembre de 2026</b><span>Fecha informada por la Dirección de Control.</span>' + more("plazo") + "</div></div>" +
       '<div class="tl">' + tl + "</div>" +
       sec("?", "Si algo queda mal") +
       '<div class="strip warn"><span class="bx">' + ic("clock") + '</span><div><b>Tienes 10 días hábiles para corregir</b><span>Si no corriges, devuelves el monto.</span>' + more("observaciones") + "</div></div>" +
@@ -742,7 +742,7 @@ footer { padding-block: 18px 28px; color: var(--muted); font-size: 14px; display
     return [
       ["min", c === "a" ? "Compré la parka y el zapato o zapatilla" : "Compré la parka, el zapato o zapatilla y el pantalón outdoor"],
       ["parka", "La parka es azul marino, o negra o café porque no había"],
-      ["sup", "La camisa o polera de todos los días es azul o celeste"],
+      ["sup", "La camisa o blusa es azul, celeste, blanca o negra"],
       ["logos", "Ninguna prenda tiene marcas o estampados grandes"],
       ["zap", "Si es zapatilla: outdoor y sin logos deportivos llamativos"],
       ["jeans", "Si son jeans: azul o negro liso, sin rasgaduras"],
