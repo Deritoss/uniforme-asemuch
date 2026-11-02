@@ -53,7 +53,7 @@ button:active { transform: scale(.97); }
 :focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
 svg { display: block; }
 .ico { width: 24px; height: 24px; flex: none; }
-h1 { font-weight: 800; font-size: clamp(2rem, 8.6vw, 2.6rem); line-height: 1.05; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+h1 { font-weight: 800; font-size: clamp(1.45rem, min(8.6vw, 7cqh), 2.6rem); line-height: 1.05; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 p { margin: 0; text-wrap: pretty; }
 
 /* Barra de avance tipo historias */
@@ -67,85 +67,92 @@ p { margin: 0; text-wrap: pretty; }
 .sound { display: inline-flex; align-items: center; gap: 6px; height: 42px; border-radius: 999px; border: 1.5px solid currentColor; background: transparent; padding: 0 14px 0 10px; font-size: 15px; font-weight: 500; }
 .sound[aria-pressed="false"] { opacity: .7; }
 
-/* Tarjeta */
-.stage { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px 0 12px; scrollbar-width: none; touch-action: pan-y; }
-.stage::-webkit-scrollbar { display: none; }
-.card { min-height: 100%; display: flex; flex-direction: column; gap: 18px; }
+/* Tarjeta: una pantalla, sin desplazar. Los tamaños se ajustan al alto disponible (cqh) */
+.stage { flex: 1; min-height: 0; overflow: hidden; padding: 12px 0 6px; touch-action: pan-y; container-type: size; }
+.card { height: 100%; display: flex; flex-direction: column; gap: clamp(8px, 2.3cqh, 18px); }
 @keyframes cardIn { from { opacity: 0; transform: translateX(var(--from, 32px)); } }
 .card.in { animation: cardIn 300ms var(--ease-out) both; }
 @keyframes rise { from { opacity: 0; transform: translateY(10px) scale(.95); } }
 .pop { animation: rise 360ms var(--ease-out) both; }
 .card.still .pop { animation: none; }
-.lead { font-size: 19px; opacity: .9; }
-.more { align-self: flex-start; border: 0; background: none; padding: 0; min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-size: 17px; font-weight: 600; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.lead { font-size: clamp(15px, 3.4cqh, 19px); opacity: .9; }
+.more { margin-top: auto; align-self: flex-start; border: 0; background: none; padding: 0; min-height: 40px; display: inline-flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 600; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; flex: none; }
 .more:active { transform: scale(.98); }
 
 /* Piezas */
-.opt { width: 100%; text-align: left; border: 0; border-radius: 22px; padding: 18px; display: flex; align-items: center; gap: 16px; background: #FFFFFF; color: var(--ink); box-shadow: 0 6px 0 rgba(0,0,0,.2); transition: transform 120ms var(--ease-out), box-shadow 160ms var(--ease-out); }
+.opt { width: 100%; text-align: left; border: 0; border-radius: 22px; padding: clamp(12px, 2.6cqh, 18px); display: flex; align-items: center; gap: 14px; background: #FFFFFF; color: var(--ink); box-shadow: 0 6px 0 rgba(0,0,0,.2); transition: transform 120ms var(--ease-out), box-shadow 160ms var(--ease-out); }
 .opt:active { transform: translateY(4px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
-.opt .ic-wrap { width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center; flex: none; }
-.opt .ic-wrap .ico { width: 34px; height: 34px; }
-.opt b { display: block; font-size: 21px; line-height: 1.15; }
+.opt .ic-wrap { width: clamp(46px, 10cqh, 60px); height: clamp(46px, 10cqh, 60px); border-radius: 16px; display: grid; place-items: center; flex: none; }
+.opt .ic-wrap .ico { width: 32px; height: 32px; }
+.opt b { display: block; font-size: clamp(18px, 4cqh, 21px); line-height: 1.15; }
 .opt span.s { font-size: 15px; opacity: .75; }
 .opt[aria-pressed="true"] { box-shadow: 0 0 0 4px var(--sun), 0 6px 0 rgba(0,0,0,.2); }
 .opt[aria-pressed="true"]:active { box-shadow: 0 0 0 4px var(--sun), 0 2px 0 rgba(0,0,0,.2); }
-.row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.big-g { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-weight: 600; font-size: 16px; width: 140px; }
-.big-g .g { width: 120px; height: 120px; filter: drop-shadow(0 6px 6px rgba(18, 34, 74, .14)); }
-.badge { font-weight: 800; font-size: 15px; background: var(--ink); color: #fff; border-radius: 999px; padding: 2px 10px; font-variant-numeric: tabular-nums; }
-.pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: 16px; background: rgba(255,255,255,.65); }
-.colorline { display: flex; flex-direction: column; gap: 10px; }
-.cl { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.7); border-radius: 18px; padding: 12px 14px; font-size: 17px; }
-.cl .sw { width: 44px; height: 44px; border-radius: 50%; flex: none; border: 2px solid rgba(0,0,0,.08); box-shadow: 0 0 0 3px rgba(255,255,255,.9); }
-.cl .mark { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; }
+.row { display: flex; gap: 8px; justify-content: center; }
+.big-g { flex: 1; max-width: 140px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; font-weight: 600; font-size: clamp(13.5px, 3cqh, 16px); line-height: 1.2; }
+.big-g .g { width: min(100%, 22cqh, 120px); height: min(100%, 22cqh, 120px); aspect-ratio: 1; filter: drop-shadow(0 6px 6px rgba(18, 34, 74, .14)); }
+.badge { font-weight: 800; font-size: 14px; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 9px; font-variant-numeric: tabular-nums; }
+.pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 16px; padding: 8px 14px; font-weight: 600; font-size: clamp(14px, 3cqh, 16px); background: rgba(255,255,255,.65); align-self: flex-start; }
+.pill .ico { flex: none; }
+.colorline { display: flex; flex-direction: column; gap: clamp(6px, 1.6cqh, 10px); }
+.cl { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.7); border-radius: 18px; padding: clamp(8px, 1.9cqh, 12px) 14px; font-size: clamp(15px, 3.3cqh, 17px); line-height: 1.3; }
+.cl .sw { width: clamp(34px, 7.5cqh, 44px); height: clamp(34px, 7.5cqh, 44px); border-radius: 50%; flex: none; border: 2px solid rgba(0,0,0,.08); box-shadow: 0 0 0 3px rgba(255,255,255,.9); }
+.cl .mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; }
 
-/* Probador */
-.try { display: flex; flex-direction: column; gap: 14px; }
-.tstage { position: relative; height: 200px; border-radius: 26px; background: #F1F4F9; display: grid; place-items: center; overflow: hidden; background-image: radial-gradient(90% 60% at 50% 100%, #E3E9F2 0, transparent 70%); }
-.tstage .g { width: 170px; height: 170px; filter: drop-shadow(0 8px 8px rgba(18, 34, 74, .14)); }
-.verdict { border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 17px; color: #fff; transition: background-color 240ms ease; }
-.verdict.ok { background: var(--ok); } .verdict.warn { background: var(--warn); } .verdict.bad { background: var(--bad); } .verdict.hold { background: #9C3D10; }
-.verdict b { font-size: 19px; }
-.gchips { display: flex; flex-wrap: wrap; gap: 8px; }
-.gc { border: 2px solid #C9D3E3; background: #fff; border-radius: 999px; min-height: 44px; padding: 0 16px; font-weight: 600; font-size: 16px; color: var(--ink); }
+/* Probador: la prenda y el veredicto, lado a lado */
+.gchips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.gc { border: 2px solid #C9D3E3; background: #fff; border-radius: 999px; min-height: clamp(38px, 7.5cqh, 44px); padding: 0 6px; font-weight: 600; font-size: 15px; color: var(--ink); }
 .gc[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-.dots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px 6px; }
-.dt { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; color: var(--ink); padding: 0; }
+.fit { display: grid; grid-template-columns: minmax(0, 44fr) minmax(0, 56fr); gap: 8px; height: clamp(108px, 26cqh, 200px); flex: none; }
+.tstage { position: relative; border-radius: 22px; background: #F1F4F9; display: grid; place-items: center; overflow: hidden; background-image: radial-gradient(90% 60% at 50% 100%, #E3E9F2 0, transparent 70%); }
+.tstage .g { width: 86%; height: 86%; filter: drop-shadow(0 8px 8px rgba(18, 34, 74, .14)); }
+.verdict { border-radius: 22px; padding: clamp(10px, 2.4cqh, 16px) 14px; display: flex; flex-direction: column; justify-content: center; gap: 4px; font-weight: 500; font-size: clamp(14px, 3.1cqh, 16px); line-height: 1.3; color: #fff; transition: background-color 240ms ease; }
+.verdict .ico { width: 26px; height: 26px; }
+.verdict b { display: block; font-size: clamp(19px, 4.4cqh, 24px); line-height: 1.1; }
+.verdict.ok { background: var(--ok); } .verdict.warn { background: var(--warn); } .verdict.bad { background: var(--bad); } .verdict.hold { background: #9C3D10; }
+.dots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px 4px; }
+.dt { border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 12.5px; color: var(--ink); padding: 0; min-height: 44px; }
 .dt:active { transform: none; }
-.dt .c { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(0,0,0,.1); transition: transform 220ms var(--ease-out), box-shadow 200ms ease; }
+.dt .c { width: clamp(32px, 7.2cqh, 48px); height: clamp(32px, 7.2cqh, 48px); border-radius: 50%; border: 2px solid rgba(0,0,0,.1); transition: transform 220ms var(--ease-out), box-shadow 200ms ease; }
 .dt:active .c { transform: scale(.9); }
 .dt[aria-pressed="true"] { font-weight: 700; }
 .dt[aria-pressed="true"] .c { transform: scale(1.1); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ink); }
 .dye { transition: fill 320ms ease; }
 .det { transition: stroke 320ms ease; }
 
-/* No paga */
-.nog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.ni { position: relative; border: 0; background: #fff; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; text-align: left; font-weight: 600; font-size: 16px; line-height: 1.15; color: var(--ink); min-height: 70px; box-shadow: 0 2px 0 rgba(163, 36, 28, .12); }
-.ni .ico { width: 32px; height: 32px; }
-.ni .ban { position: absolute; top: 8px; left: 34px; width: 20px; height: 20px; border-radius: 50%; background: var(--bad); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
-.ni .ban .ico { width: 12px; height: 12px; }
+/* No paga: 4 × 2, ícono sobre el nombre */
+.nog { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.ni { position: relative; border: 0; background: #fff; border-radius: 16px; padding: clamp(8px, 1.8cqh, 12px) 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-weight: 600; font-size: 12.5px; line-height: 1.15; color: var(--ink); min-height: clamp(66px, 15cqh, 92px); box-shadow: 0 2px 0 rgba(163, 36, 28, .12); }
+.ni .ico { width: 28px; height: 28px; }
+.ni .ban { position: absolute; top: 4px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--bad); color: #fff; display: grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+.ni .ban .ico { width: 11px; height: 11px; }
 
-/* Rendición */
-.steps4 { display: flex; flex-direction: column; gap: 10px; }
-.s4 { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.75); border-radius: 18px; padding: 14px; }
-.s4 .n { width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 20px; flex: none; }
-.s4 b { display: block; font-size: 18px; }
-.s4 span { font-size: 15px; opacity: .8; }
+/* Rendición: 2 × 2 */
+.steps4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.s4 { display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,.75); border-radius: 18px; padding: clamp(10px, 2.2cqh, 14px); }
+.s4 .n { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 17px; flex: none; }
+.s4 b { display: block; font-size: clamp(15px, 3.3cqh, 17px); line-height: 1.2; }
+.s4 span.t { font-size: 14px; opacity: .8; line-height: 1.25; }
 
 /* Lista final: el visto se dibuja; desmarcar es más rápido que marcar */
-.ck { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); border-radius: 18px; padding: 14px; cursor: pointer; font-size: 17px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease; }
+.cklist { position: relative; display: flex; flex-direction: column; gap: clamp(5px, 1.3cqh, 10px); }
+.ck { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.35); border-radius: 16px; padding: clamp(8px, 1.9cqh, 14px) 12px; cursor: pointer; font-size: clamp(15px, 3.2cqh, 17px); line-height: 1.25; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease; }
 .ck input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.ck .box { width: 34px; height: 34px; border-radius: 10px; border: 2.5px solid rgba(255,255,255,.7); display: grid; place-items: center; color: #fff; flex: none; transition: transform 140ms var(--ease-out), background-color 200ms ease, border-color 200ms ease; }
+.ck .box { width: 30px; height: 30px; border-radius: 9px; border: 2.5px solid rgba(255,255,255,.7); display: grid; place-items: center; color: #fff; flex: none; transition: transform 140ms var(--ease-out), background-color 200ms ease, border-color 200ms ease; }
 .ck:active .box { transform: scale(.9); }
 .ck .box .ico path { stroke-width: 2.6; stroke-dasharray: 21; stroke-dashoffset: 21; transition: stroke-dashoffset 120ms ease; }
 .ck:has(input:checked) { background: rgba(255,255,255,.95); color: var(--ink); border-color: #fff; }
 .ck:has(input:checked) .box { background: var(--ok); border-color: var(--ok); }
 .ck:has(input:checked) .box .ico path { stroke-dashoffset: 0; transition: stroke-dashoffset 240ms var(--ease-out) 40ms; }
 .ck:has(input:focus-visible) { outline: 3px solid var(--sun); outline-offset: 2px; }
-.party { border-radius: 22px; background: var(--sun); color: var(--ink); padding: 18px; display: flex; align-items: center; gap: 14px; }
-.party .ico { width: 40px; height: 40px; color: var(--ok); }
-.party b { font-size: 22px; display: block; }
+/* La estampilla: cae girada sobre la lista, con borde perforado; no tapa los toques */
+.stampwrap { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.stamp { transform: rotate(-8deg); background: var(--sun); color: var(--navy); border-radius: 6px; padding: 16px 22px 14px; text-align: center; outline: 7px dotted #1D3A8A; outline-offset: -3px; box-shadow: inset 0 0 0 9px var(--sun), inset 0 0 0 11px #1D3A8A, 0 14px 30px rgba(6, 14, 40, .45); max-width: 88%; }
+.stamp b { display: block; font-weight: 800; font-size: clamp(26px, 6.4cqh, 36px); line-height: 1; letter-spacing: -0.02em; }
+.stamp span { display: block; margin-top: 6px; font-size: 14.5px; font-weight: 600; }
+.stamp .ico { width: 30px; height: 30px; margin: 0 auto 6px; color: var(--ok); }
+@keyframes stampIn { 0% { opacity: 0; transform: rotate(-16deg) scale(1.7); } 70% { opacity: 1; transform: rotate(-7deg) scale(.96); } 100% { opacity: 1; transform: rotate(-8deg) scale(1); } }
+.stamp.hit { animation: stampIn 340ms var(--ease-out) both; }
 
 /* Navegación inferior */
 .nav { display: flex; gap: 10px; padding-block: 10px calc(14px + env(safe-area-inset-bottom, 0px)); }
@@ -187,6 +194,7 @@ p { margin: 0; text-wrap: pretty; }
   @keyframes rise { from { opacity: 0; } }
   button:active, .opt:active, .dt:active .c, .ck:active .box { transform: none; }
   .dt[aria-pressed="true"] .c { transform: none; }
+  @keyframes stampIn { from { opacity: 0; } to { opacity: 1; } }
   .segs i { transition: none; }
   .sheet-in { transform: none; opacity: 0; transition: opacity 200ms ease; }
   .sheet[data-open] .sheet-in { transform: none; opacity: 1; }
@@ -279,25 +287,25 @@ p { margin: 0; text-wrap: pretty; }
   var COLORS = ["azulmarino", "azul", "celeste", "blanco", "negro", "gris", "cafe", "beige", "amarillo", "verde"];
   function blue(c) { return c === "azulmarino" || c === "azul" || c === "celeste"; }
   var GARMENTS = [
-    { id: "parka", art: "parka", name: "Parka", rule: function (c) {
+    { id: "parka", short: "Parka", art: "parka", name: "Parka", rule: function (c) {
       if (c === "azulmarino") return ["ok", "Es el color de la parka."];
       if (c === "negro" || c === "cafe") return ["warn", "Solo en 2026 y solo si no encontraste azul marino."];
       if (c === "azul" || c === "celeste") return ["bad", "El decreto pide azul marino; si no hay, negra o café."];
       return ["bad", "No sirve para la parka."]; } },
-    { id: "camisa", art: "shirt", name: "Camisa o blusa", rule: function (c) {
+    { id: "camisa", short: "Camisa", art: "shirt", name: "Camisa o blusa", rule: function (c) {
       if (blue(c) || c === "blanco" || c === "negro") return ["ok", "Familia azul, blanco o negro."];
       return ["bad", "En la camisa este color solo va en detalles."]; } },
-    { id: "polera", art: "shirt", name: "Polera o beatle", rule: function (c) {
+    { id: "polera", short: "Polera", art: "shirt", name: "Polera o beatle", rule: function (c) {
       if (c === "verde") return ["bad", "El verde solo va en detalles pequeños."];
       return ["ok", "Es prenda secundaria."]; } },
-    { id: "pantalon", art: "pants", name: "Pantalón", rule: function (c) {
+    { id: "pantalon", short: "Pantalón", art: "pants", name: "Pantalón", rule: function (c) {
       if (blue(c) || c === "negro" || c === "blanco") return ["ok", "La familia azul, el negro y el blanco sirven en el pantalón."];
       if (c === "gris" || c === "cafe" || c === "beige") return ["ok", "Control acepta gris, café y beige."];
       return ["bad", "No sirve como color principal."]; } },
-    { id: "jeans", art: "jeans", name: "Jeans", rule: function (c) {
+    { id: "jeans", short: "Jeans", art: "jeans", name: "Jeans", rule: function (c) {
       if (c === "azul" || c === "azulmarino" || c === "negro") return ["ok", "Si es liso y sin rasgaduras."];
             return ["bad", "Solo azul o negro liso."]; } },
-    { id: "zapato", art: "shoe", name: "Zapato o zapatilla", rule: function (c) {
+    { id: "zapato", short: "Calzado", art: "shoe", name: "Zapato o zapatilla", rule: function (c) {
       if (c === "verde" || c === "amarillo") return ["bad", "No sirve para el calzado."];
       return ["ok", "Si es zapatilla, sin logos llamativos."]; } }
   ];
@@ -423,7 +431,7 @@ p { margin: 0; text-wrap: pretty; }
     { bg: "#1D3A8A", dark: true, name: "Tu categoría" },
     { bg: "#FFE08A", dark: false, name: "Lo obligatorio" },
     { bg: "#CFE3F7", dark: false, name: "La parka 2026" },
-    { bg: "#FFFFFF", dark: false, name: "¿Sirve este color?" },
+    { bg: "#FFFFFF", dark: false, name: "Prueba de color" },
     { bg: "#FBE0DE", dark: false, name: "Lo que no paga" },
     { bg: "#D5EFE2", dark: false, name: "La rendición" },
     { bg: "#1D3A8A", dark: true, name: "Antes de pagar" }
@@ -458,27 +466,27 @@ p { margin: 0; text-wrap: pretty; }
     var items = [["parka", SW.azulmarino[1], "Parka azul marino"], ["shoe", SW.cafe[1], "Zapato o zapatilla"]];
     if (b) items.push(["pants", SW.azulmarino[1], "Pantalón outdoor"]);
     var gs = items.map(function (x, i) { return '<div class="big-g pop" style="animation-delay:' + D1[i] + 'ms">' + garment(x[0], x[1]) + '<span class="badge">1</span><span>' + x[2] + "</span></div>"; }).join("");
-    return "<h1>Primero, compra " + (b ? "estas 3 prendas" : "estas 2 prendas") + "</h1><p class=\"lead\">Son obligatorias. Después, con lo que quede, compras lo que quieras de la lista.</p>" +
+    return "<h1>Primero, compra " + (b ? "estas 3 prendas" : "estas 2 prendas") + "</h1><p class=\"lead\">Son obligatorias. Con lo que quede, compras otras prendas de la lista.</p>" +
       '<div class="row">' + gs + "</div>" +
       '<span class="pill">Tu tarjeta: 6 UTM. Lo que no uses se pierde.</span>' + more("obligatorio");
   }
   function c2() {
-    return "<h1>La parka, solo este año</h1><p class=\"lead\">Puede ser parka, chaqueta o cortaviento. El color va en este orden:</p>" +
+    return "<h1>La parka, solo este año</h1><p class=\"lead\">Puede ser parka, chaqueta o cortaviento. El color, en este orden:</p>" +
       '<div class="colorline">' +
       '<div class="cl pop" style="animation-delay:100ms"><span class="sw" style="background:#1F2B4A"></span><span style="flex:1"><b>Azul marino</b><br>Siempre primero</span><span class="mark" style="background:var(--ok)">' + ic("check") + "</span></div>" +
       '<div class="cl pop" style="animation-delay:170ms"><span class="sw" style="background:#1B1B1B"></span><span class="sw" style="background:#6B4A2B;margin-left:-26px"></span><span style="flex:1"><b>Negro o café</b><br>Solo si no hay azul marino</span><span class="mark" style="background:var(--warn)">' + ic("alert") + "</span></div>" +
       '<div class="cl pop" style="animation-delay:240ms"><span style="flex:1"><b>Otro color</b><br>No sirve</span><span class="mark" style="background:var(--bad)">' + ic("x") + "</span></div>" +
       "</div>" + more("parka");
   }
-  function verdictInner(r) { var v = VERD[r[0]]; return ic(v[0]) + "<span><b>" + v[1] + ".</b> " + r[1] + "</span>"; }
+  function verdictInner(r) { var v = VERD[r[0]]; return ic(v[0]) + "<b>" + v[1] + "</b><span>" + r[1] + "</span>"; }
   function c3() {
     var g = curG(), r = g.rule(state.c);
-    var chips = GARMENTS.map(function (x) { return '<button type="button" class="gc" data-g="' + x.id + '" aria-pressed="' + (x.id === state.g) + '">' + x.name + "</button>"; }).join("");
+    var chips = GARMENTS.map(function (x) { return '<button type="button" class="gc" data-g="' + x.id + '" aria-pressed="' + (x.id === state.g) + '" aria-label="' + x.name + '">' + x.short + "</button>"; }).join("");
     var dots = COLORS.map(function (k) { return '<button type="button" class="dt" data-c="' + k + '" aria-pressed="' + (state.c === k) + '"><span class="c" style="background:' + SW[k][1] + '"></span>' + SW[k][0] + "</button>"; }).join("");
-    return "<h1>¿Sirve este color?</h1><p class=\"lead\">Elige la prenda y toca un color.</p>" +
-      '<div class="try"><div class="gchips">' + chips + "</div>" +
-      '<div class="tstage" id="tstage">' + garment(g.art, SW[state.c][1]) + '</div><div class="verdict ' + r[0] + '" id="verdict">' + verdictInner(r) + "</div>" +
-      '<div class="dots">' + dots + "</div></div>" + more("colores", "Ver las reglas de colores");
+    return "<h1>¿Sirve este color?</h1>" +
+      '<div class="gchips">' + chips + "</div>" +
+      '<div class="fit"><div class="tstage" id="tstage">' + garment(g.art, SW[state.c][1]) + '</div><div class="verdict ' + r[0] + '" id="verdict" aria-live="polite">' + verdictInner(r) + "</div></div>" +
+      '<div class="dots">' + dots + "</div>" + more("colores", "Ver las reglas de colores");
   }
   function updateTry(changed) {
     var g = curG(), hex = SW[state.c][1], r = g.rule(state.c);
@@ -498,21 +506,21 @@ p { margin: 0; text-wrap: pretty; }
   function c4() {
     var items = [["underwear", "Ropa interior"], ["swim", "Traje de baño"], ["bowtie", "Ropa de fiesta"], ["bag", "Carteras y mochilas"], ["perfume", "Joyas y perfumes"], ["sandal", "Sandalias"], ["sneaker", "Zapatillas deportivas"], ["plug", "Cosas del hogar"]];
     var tiles = items.map(function (x, i) { return '<div class="ni pop" style="animation-delay:' + (80 + i * 45) + 'ms">' + ic(x[0]) + '<span class="ban">' + ic("x") + "</span><span>" + x[1] + "</span></div>"; }).join("");
-    return "<h1>Con la tarjeta no se compra esto</h1>" + '<div class="nog">' + tiles + "</div>" +
+    return "<h1>Esto no se compra con la tarjeta</h1>" + '<div class="nog">' + tiles + "</div>" +
       '<span class="pill">' + ic("helmet") + "Botas de seguridad y cascos: los da gratis la Municipalidad.</span>" + more("nopaga");
   }
   function c5() {
-    var s = [["Compra con boleta", "Que diga qué prenda compraste"], ["Llena el formulario", "Lo entrega la Dirección de Control"], ["Tu jefatura lo firma", "Revisa que todo sea de tu categoría"], ["Control lo revisa", "Si hay que corregir, tienes 10 días hábiles"]];
-    return "<h1>Después de comprar, rinde</h1><p class=\"lead\">Son 4 pasos, en este orden.</p>" + '<div class="steps4">' +
-      s.map(function (x, i) { return '<div class="s4 pop" style="animation-delay:' + D5[i] + 'ms"><span class="n">' + (i + 1) + "</span><span><b>" + x[0] + "</b><span>" + x[1] + "</span></span></div>"; }).join("") + "</div>" + '<span class="pill">Plazo: hasta el 30 de noviembre de 2026.</span>' + more("rendicion");
+    var s = [["Compra con boleta", "Que diga cada prenda"], ["Llena el formulario", "Lo entrega Control"], ["Tu jefatura lo firma", "Revisa tu categoría"], ["Control lo revisa", "Para corregir: 10 días hábiles"]];
+    return "<h1>Después de comprar, rinde</h1>" + '<div class="steps4">' +
+      s.map(function (x, i) { return '<div class="s4 pop" style="animation-delay:' + D5[i] + 'ms"><span class="n">' + (i + 1) + "</span><b>" + x[0] + '</b><span class="t">' + x[1] + "</span></div>"; }).join("") + "</div>" + '<span class="pill">Plazo: hasta el 30 de noviembre de 2026.</span>' + more("rendicion");
   }
-  var CHECKS = [["obl", "Compré las prendas obligatorias"], ["azul", "Lo que más se ve es azul, celeste o azul marino"], ["marcas", "Sin marcas ni estampados grandes"], ["nada", "Nada deportivo, de fiesta ni EPP"], ["boleta", "Pedí boleta con el detalle"]];
+  var CHECKS = [["obl", "Compré las prendas obligatorias"], ["azul", "Lo que más se ve es de la familia azul"], ["marcas", "Sin marcas ni estampados grandes"], ["nada", "Nada deportivo, de fiesta ni EPP"], ["boleta", "Pedí boleta con el detalle"]];
   function countChecks() { return CHECKS.filter(function (x) { return state.checks[x[0]]; }).length; }
-  var PARTY = '<div class="party">' + ic("party") + "<span><b>¡Listo para pagar!</b>Guarda la boleta para la rendición.</span></div>";
+  var PARTY = '<div class="stamp" role="status">' + ic("party") + "<b>¡Listo para pagar!</b><span>Guarda la boleta para la rendición.</span></div>";
   function c6() {
-    return "<h1>Antes de pagar en la caja</h1><p class=\"lead\">Marca cada punto.</p>" +
-      CHECKS.map(function (x) { return '<label class="ck" for="k-' + x[0] + '"><input type="checkbox" id="k-' + x[0] + '" data-k="' + x[0] + '"' + (state.checks[x[0]] ? " checked" : "") + '><span class="box">' + ic("check") + "</span><span>" + x[1] + "</span></label>"; }).join("") +
-      '<div id="partybox">' + (countChecks() === CHECKS.length ? PARTY : "") + "</div>";
+    return "<h1>Antes de pagar</h1><p class=\"lead\">Marca cada punto.</p>" +
+      '<div class="cklist">' + CHECKS.map(function (x) { return '<label class="ck" for="k-' + x[0] + '"><input type="checkbox" id="k-' + x[0] + '" data-k="' + x[0] + '"' + (state.checks[x[0]] ? " checked" : "") + '><span class="box">' + ic("check") + "</span><span>" + x[1] + "</span></label>"; }).join("") +
+      '<div class="stampwrap" id="partybox">' + (countChecks() === CHECKS.length ? PARTY : "") + "</div></div>";
   }
   var VIEWS = [c0, c1, c2, c3, c4, c5, c6];
 
@@ -639,7 +647,7 @@ p { margin: 0; text-wrap: pretty; }
     if (t.checked && all) play("done"); else if (t.checked) play("tick", count); else play("untick");
     if (t.checked && !RM) anim(t.parentNode.querySelector(".box"), [{ transform: "scale(.82)" }, { transform: "scale(1.06)", offset: 0.6 }, { transform: "scale(1)" }], 300);
     var box = $("partybox"), cur = box.firstElementChild;
-    if (all && (!cur || cur.dataset.leaving)) { box.innerHTML = PARTY; rise(box.firstElementChild); }
+    if (all && (!cur || cur.dataset.leaving)) { box.innerHTML = PARTY; var st = box.firstElementChild; setTimeout(function () { st.classList.add("hit"); }, 0); }
     else if (!all && cur && !cur.dataset.leaving) {
       cur.dataset.leaving = "1";
       var a = anim(cur, [{ opacity: 1 }, { opacity: 0 }], 150, { fill: "forwards" });
